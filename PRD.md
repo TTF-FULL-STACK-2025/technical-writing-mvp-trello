@@ -174,6 +174,6 @@ This document describes the requirements for developing a scalable, secure, and 
 | Filippo Granata | Member |
 | Samuele Gonnella | Member |
 | Corinna Buzzi | Member |
-| MariaLia Pero | Member |
+| Marialia Pero | Member |
 | Alessandro Cervini | Member |
 | Gloria Candela | Member |
