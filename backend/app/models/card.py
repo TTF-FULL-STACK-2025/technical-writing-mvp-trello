@@ -16,25 +16,7 @@ class Card(Base):
     due_date: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     archived_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     list = relationship("List", back_populates="cards")
     comments = relationship("Comment", back_populates="card", cascade="all, delete-orphan")
-# Add File: backend/app/models/comment.py
-from sqlalchemy import String, Integer, DateTime, ForeignKey, Text
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from datetime import datetime
-from app.core.database import Base
-
-
-class Comment(Base):
-    __tablename__ = "comments"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    card_id: Mapped[int] = mapped_column(ForeignKey("cards.id", ondelete="CASCADE"), index=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
-    text: Mapped[str] = mapped_column(Text)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-
-    card = relationship("Card", back_populates="comments")
