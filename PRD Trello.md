@@ -1,171 +1,179 @@
-# 🧭 Product Requirements Document (PRD) – Backend Trello-like System
+# 🧭 Product Requirements Document (PRD) – Trello-like Backend System
 
-**Titolo del progetto:** Backend Core per Piattaforma di Gestione Progetti (Trello-like) <br>
-**Versione:** 1.0<br>
-**Data:** 19/11/2025<br>
-**Autore:** Team Work<br>
-**Approvato da:** Luca Sacchi Ricciardi
+**Project Title:** Core Backend for Project Management Platform (Trello-like)
+**Version:** 1.0
+**Date:** November 19, 2025
+**Author:** AI Assistant
+**Approved by:** [To be defined]
 
 ---
 
 ## 🧱 1. Overview
 
-### 1.1 Descrizione generale
+### 1.1 General Description
 
-Questo documento descrive i requisiti per lo sviluppo di un **sistema backend-only** scalabile, sicuro e performante, che emuli le funzionalità di base di una piattaforma di gestione progetti in stile Trello. Il sistema fornirà le API RESTful necessarie per gestire utenti, board, liste, card (task) e la collaborazione, escludendo qualsiasi sviluppo di interfaccia utente.
+This document describes the requirements for developing a scalable, secure, and high-performing **backend-only system** that emulates the core functionalities of a Trello-style project management platform. The system will provide the necessary RESTful APIs to manage users, boards, lists, cards (tasks), and collaboration, excluding any user interface development.
 
-### 1.2 Contesto / Motivazione
+### 1.2 Context / Motivation
 
-* **Problema Utente:** Le organizzazioni e i team necessitano di una piattaforma flessibile e centralizzata per tracciare il lavoro, gestire i flussi e facilitare la collaborazione sui task.
-* **Obiettivi Aziendali:** Creare un solido backend come base per future applicazioni (web/mobile), garantendo **scalabilità** e **performance** elevate fin dall'inizio per supportare una rapida crescita.
-* **Insight:** L'architettura deve essere **API-first** per consentire integrazioni future e uno sviluppo frontend disaccoppiato.
+* **User Problem:** Organizations and teams need a flexible and centralized platform to track work, manage workflows, and facilitate task collaboration.
+* **Business Objectives:** To create a solid backend foundation for future applications (web/mobile), ensuring high **scalability** and **performance** from the start to support rapid growth.
+* **Insight:** The architecture must be **API-first** to allow for future integrations and decoupled frontend development.
 
-### 1.3 Obiettivi principali
+### 1.3 Key Objectives
 
-* **Sviluppare un backend** scalabile, sicuro e ad alte prestazioni (API call $<300$ms).
-* **Supportare tutte le funzionalità core** di un sistema di gestione task (CRUD per Board, Liste, Card, Utenti).
-* **Fornire API RESTful complete** e ben documentate (OpenAPI 3.x).
-* **Abilitare la gestione di utenti, autenticazione e autorizzazione** per la collaborazione.
+* **Develop a scalable, secure, and high-performing backend** (API call $<300$ms).
+* **Support all core features** of a task management system (CRUD for Boards, Lists, Cards, Users).
+* **Provide complete** and well-documented **RESTful APIs** (OpenAPI 3.x).
+* **Enable user management, authentication, and authorization** for collaboration.
 
-### 1.4 Non obiettivi (Out of Scope)
+### 1.4 Non-Objectives (Out of Scope)
 
-* Interfaccia Utente / Frontend di qualsiasi tipo.
-* Funzionalità avanzate tipo Power-Ups, automazioni complesse o template di board.
-* Integrazioni con sistemi esterni (Slack, GitHub, ecc.).
-* Gestione fisica di file per gli allegati (solo metadata).
-
----
-
-## 🎯 2. Target & Utente
-
-### 2.1 Personas principali
-
-* **Marco (Developer Backend):** Ruolo: Implementatore del sistema. Bisogno: API chiare, stabili e ben documentate per la facile integrazione con il frontend. Pain Point: Documentazione API obsoleta o incompleta.
-* **Laura (Project Manager):** Ruolo: Utilizzatore finale (tramite futuro frontend). Bisogno: Gestire i flussi di lavoro, assegnare task e tracciare lo stato di avanzamento. Obiettivo: Avere uno strumento affidabile per la pianificazione e l'esecuzione.
-* **Giovanni (Amministratore di Sistema):** Ruolo: Garante dell'infrastruttura. Bisogno: Sistema scalabile, monitorabile e con un'architettura manutenibile.
-
-### 2.2 Use cases / Scenari
-
-* **Scenario 1: Setup Iniziale del Team:** Un nuovo utente si registra, crea una nuova Board, e aggiunge i membri del suo team assegnando loro il ruolo di `Editor`.
-* **Scenario 2: Gestione del Task:** Un membro del team crea una Card, la sposta tra Liste, aggiunge una `Due Date` e assegna un `Label`. Un altro membro aggiunge un `Commento`.
-* **Scenario 3: Audit:** L'Owner della Board verifica l'attività recente sulla Board attraverso il log degli eventi.
+* User Interface / Frontend of any kind.
+* Advanced features such as Power-Ups, complex automations, or board templates.
+* Integrations with external systems (Slack, GitHub, etc.).
+* Physical file management for attachments (metadata only).
 
 ---
 
-## 🧩 3. Requisiti di prodotto
+## 🎯 2. Target & User
 
-### 3.1 Functional Requirements (Funzionali)
+### 2.1 Key Personas
 
-| ID | Nome | Descrizione | Priorità (MoSCoW) | Note |
+* **Marco (Backend Developer):** Role: System implementer. Need: Clear, stable, and well-documented APIs for easy frontend integration. Pain Point: Outdated or incomplete API documentation.
+* **Laura (Project Manager):** Role: End user (via future frontend). Need: Manage workflows, assign tasks, and track progress. Goal: Have a reliable tool for planning and execution.
+* **Giovanni (System Administrator):** Role: Infrastructure guarantor. Need: Scalable, monitorable system with a maintainable architecture.
+
+### 2.2 Use Cases / Scenarios
+
+* **Scenario 1: Initial Team Setup:** A new user registers, creates a new Board, and adds their team members, assigning them the `Editor` role.
+* **Scenario 2: Task Management:** A team member creates a Card, moves it between Lists, adds a `Due Date`, and assigns a `Label`. Another member adds a `Comment`.
+* **Scenario 3: Audit:** The Board Owner checks recent activity on the Board via the event log.
+
+---
+
+## 🧩 3. Product Requirements
+
+### 3.1 Functional Requirements
+
+| ID | Name | Description | Priority (MoSCoW) | Notes |
 |:---|:---|:---|:---|:---|
-| FR1.1 | Registrazione Utente | L'utente deve potersi registrarsi con email e password. | Must | |
-| FR1.2 | Login/Logout | Gestione sessione e autenticazione tramite credenziali. | Must | Uso di JWT. |
-| FR1.3 | Gestione Board | CRUD completo per le Board (Creazione, Modifica, Archiviazione/Eliminazione). | Must | |
-| FR1.4 | Gestione Liste | CRUD e riordinamento delle Liste all'interno di una Board. | Must | |
-| FR1.5 | Gestione Card | CRUD e modifica di titolo, descrizione, assegnatari, due date, label. | Must | |
-| FR1.6 | Spostamento Card | Possibilità di riordinare le Card e spostarle tra Liste diverse. | Must | |
-| FR1.7 | Commenti | Aggiunta ed eliminazione di commenti sulle Card. | Should | |
-| FR1.8 | Membri Board | Aggiunta, rimozione e gestione dei ruoli (`Owner`, `Editor`, `Viewer`). | Must | |
-| FR1.9 | Log Attività | Tracciamento delle modifiche (CRUD) su Board, Liste e Card. | Must | |
-| FR1.10 | Notifiche Base | Notifiche per assegnazione Card. | Should | |
+| FR1.1 | User Registration | User must be able to register with email and password. | Must | |
+| FR1.2 | Login/Logout | Session management and authentication via credentials. | Must | Use of JWT. |
+| FR1.3 | Board Management | Complete CRUD for Boards (Create, Edit, Archive/Delete). | Must | |
+| FR1.4 | List Management | CRUD and reordering of Lists within a Board. | Must | |
+| FR1.5 | Card Management | CRUD and editing of title, description, assignees, due date, labels. | Must | |
+| FR1.6 | Card Movement | Ability to reorder Cards and move them between different Lists. | Must | |
+| FR1.7 | Comments | Adding and deleting comments on Cards. | Should | |
+| FR1.8 | Board Members | Adding, removing, and managing roles (`Owner`, `Editor`, `Viewer`). | Must | |
+| FR1.9 | Activity Log | Tracking modifications (CRUD) on Boards, Lists, and Cards. | Must | |
+| FR1.10 | Basic Notifications | Notifications for card assignment. | Should | |
 
-### 3.2 Non-Functional Requirements (Non Funzionali)
+### 3.2 Non-Functional Requirements
 
-| Tipo | Descrizione | Misura/Esempio |
+| Type | Description | Measure/Example |
 |:---|:---|:---|
-| **Performance** | Bassa latenza delle risposte API. | Tempo di risposta medio $<300$ms. |
-| **Scalabilità** | Capacità di gestire un aumento del carico di lavoro. | Architettura che supporti la scalabilità orizzontale. |
-| **Sicurezza** | Protezione dei dati e delle comunicazioni. | Autenticazione JWT, crittografia password, rate limiting. |
-| **Affidabilità** | Disponibilità e continuità del servizio. | $99.5\%$ di uptime. Implementazione di una strategia di backup. |
-| **Documentazione** | API chiare e auto-documentate. | Uso di Swagger/OpenAPI 3.x per la documentazione automatica. |
+| **Performance** | Low API response latency. | Average response time $<300$ms. |
+| **Scalability** | Ability to handle increased workload. | Architecture supporting horizontal scalability. |
+| **Security** | Data and communication protection. | JWT Authentication, password encryption, rate limiting. |
+| **Reliability** | Service availability and continuity. | $99.5\%$ uptime. Implementation of a backup strategy. |
+| **Documentation** | Clear and self-documented APIs. | Use of Swagger/OpenAPI 3.x for automatic documentation. |
 
 ---
 
 ## 🧠 4. User Experience / Design
 
-### 4.1 Flusso utente (User Flow)
+### 4.1 User Flow
 
-1.  **Registrazione:** Utente $\rightarrow$ `POST /register` $\rightarrow$ Riceve token JWT.
-2.  **Board Setup:** Utente $\rightarrow$ `POST /boards` $\rightarrow$ `POST /boards/{id}/members` (aggiunta membri) $\rightarrow$ `POST /boards/{id}/lists`.
-3.  **Task Management:** Utente $\rightarrow$ `POST /lists/{id}/cards` $\rightarrow$ `PATCH /cards/{id}` (spostamento/modifica) $\rightarrow$ `POST /cards/{id}/comments`.
+1.  **Registration:** User $\rightarrow$ `POST /register` $\rightarrow$ Receives JWT token.
+2.  **Board Setup:** User $\rightarrow$ `POST /boards` $\rightarrow$ `POST /boards/{id}/members` (add members) $\rightarrow$ `POST /boards/{id}/lists`.
+3.  **Task Management:** User $\rightarrow$ `POST /lists/{id}/cards` $\rightarrow$ `PATCH /cards/{id}` (move/edit) $\rightarrow$ `POST /cards/{id}/comments`.
 
-### 4.2 Wireframe / Mockup
+### 4.2 Wireframes / Mockups
 
-> *Non applicabile per un progetto strettamente Backend-only.*
+> *Not applicable for a strictly Backend-only project.*
 
 ### 4.3 Copy & Tone of Voice
 
-> *Tutti i messaggi di errore (status code HTTP) e di validazione devono essere chiari e standardizzati.*
+> *All error messages (HTTP status codes) and validation messages must be clear and standardized.*
 
 ---
 
-## ⚙️ 5. Architettura tecnica / API
+## ⚙️ 5. Technical Architecture / API
 
-### 5.1 Dipendenze tecniche
+### 5.1 Technical Dependencies
 
-* **Backend:** Node.js/Express o Python/FastAPI (scelta raccomandata).
-* **Database:** PostgreSQL (preferito) o MongoDB.
-* **Autenticazione:** OAuth2/JWT Bearer Token.
-* **Containerizzazione:** Docker.
+* **Backend:** Node.js/Express or Python/FastAPI (recommended choice).
+* **Database:** PostgreSQL (preferred) or MongoDB.
+* **Authentication:** OAuth2/JWT Bearer Token.
+* **Containerization:** Docker.
 
-### 5.2 Endpoint previsti (se rilevante)
+### 5.2 Planned Endpoints (if relevant)
 
-| Endpoint | Metodo | Descrizione | Input | Output |
+| Endpoint | Method | Description | Input | Output |
 |:---|:---|:---|:---|:---|
-| `/v1/auth/login` | POST | Autenticazione utente | email, password | JWT Token |
-| `/v1/boards` | POST | Crea una nuova Board | nome, descrizione | ID Board |
-| `/v1/boards/{id}/lists` | POST | Aggiunge una Lista alla Board | nome | ID Lista |
-| `/v1/cards` | POST | Crea una Card in una Lista | titolo, descrizione, ID Lista | ID Card |
-| `/v1/cards/{id}/move` | PATCH | Sposta una Card | ID nuova Lista, posizione | Status 200 |
+| `/v1/auth/login` | POST | User Authentication | email, password | JWT Token |
+| `/v1/boards` | POST | Creates a new Board | name, description | Board ID |
+| `/v1/boards/{id}/lists` | POST | Adds a List to the Board | name | List ID |
+| `/v1/cards` | POST | Creates a Card in a List | title, description, List ID | Card ID |
+| `/v1/cards/{id}/move` | PATCH | Moves a Card | New List ID, position | Status 200 |
 
-### 5.3 Considerazioni DevOps / Scalabilità
+### 5.3 DevOps / Scalability Considerations
 
-* **Scalabilità:** Design dell'applicazione e del database per supportare la scalabilità orizzontale.
-* **CI/CD:** Pipeline automatizzata per test e deploy (tramite Docker).
-* **Logging:** Implementazione di un sistema di logging centralizzato (es. ELK Stack) per il monitoraggio.
-
----
-
-## 🧪 6. Metriche e Success Criteria
-
-### 6.1 KPI principali
-
-* **Board Creation Success Rate:** Tasso di successo nella creazione di Board $\rightarrow$ $100\%$ (zero errori critici).
-* **Average API Response Time (AART):** Tempo medio di risposta delle API $\rightarrow <300$ms.
-* **Critical Vulnerability Count:** Numero di vulnerabilità critiche rilevate $\rightarrow$ Zero.
-
-### 6.2 Metriche secondarie
-
-* **Error Rate:** Percentuale di richieste API che ritornano status code $5xx \rightarrow <0.1\%$.
-* **Test Coverage:** Copertura dei test unitari e di integrazione $\rightarrow >80\%$.
+* **Scalability:** Application and database design to support horizontal scalability.
+* **CI/CD:** Automated pipeline for testing and deployment (via Docker).
+* **Logging:** Implementation of a centralized logging system (e.g., ELK Stack) for monitoring.
 
 ---
 
-## 📅 7. Pianificazione e Scadenze
+## 🧪 6. Metrics and Success Criteria
 
-| Fase | Attività | Responsabile | Data inizio | Data fine |
+### 6.1 Key KPIs
+
+* **Board Creation Success Rate:** Success rate for Board creation $\rightarrow$ $100\%$ (zero critical errors).
+* **Average API Response Time (AART):** Average API response time $\rightarrow <300$ms.
+* **Critical Vulnerability Count:** Number of critical vulnerabilities detected in security tests $\rightarrow$ Zero.
+
+### 6.2 Secondary Metrics
+
+* **Error Rate:** Percentage of API requests returning $5xx$ status codes $\rightarrow <0.1\%$.
+* **Test Coverage:** Unit and integration test coverage $\rightarrow >80\%$.
+
+---
+
+## 📅 7. Planning and Deadlines
+
+| Phase | Activity | Responsible | Start Date | End Date |
 |:---|:---|:---|:---|:---|
-| **Fase 1** | Setup Architettura, Autenticazione (JWT, Auth) | Dev team | [Da definire] | 2 Settimane |
-| **Fase 2** | Gestione Board e Liste (CRUD, Membri, Ruoli) | Dev team | [Dopo Fase 1] | 3 Settimane |
-| **Fase 3** | Gestione Card e Commenti (CRUD, Spostamento, Due Date, Label) | Dev team | [Dopo Fase 2] | 3 Settimane |
-| **Fase 4** | Activity Log, Notifiche Base, Upload Metadata | Dev team | [Dopo Fase 3] | 2 Settimane |
-| **Fase 5** | Hardening Sicurezza, Testing Finale, Documentazione, Deployment | Dev team | [Dopo Fase 4] | 1 Settimana |
+| **Phase 1** | Architecture Setup, Authentication (JWT, Auth) | Dev Team | [To be defined] | 2 Weeks |
+| **Phase 2** | Board and List Management (CRUD, Members, Roles) | Dev Team | [After Phase 1] | 3 Weeks |
+| **Phase 3** | Card and Comment Management (CRUD, Move, Due Date, Label) | Dev Team | [After Phase 2] | 3 Weeks |
+| **Phase 4** | Activity Log, Basic Notifications, Metadata Upload | Dev Team | [After Phase 3] | 2 Weeks |
+| **Phase 5** | Security Hardening, Final Testing, Documentation, Deployment | Dev Team | [After Phase 4] | 1 Week |
 
 ---
 
-## ⚠️ 8. Rischi e Dipendenze
+## ⚠️ 8. Risks and Dependencies
 
-| Tipo | Descrizione | Mitigazione |
+| Type | Description | Mitigation |
 |:---|:---|:---|
-| **Tecnico** | Insufficiente scalabilità iniziale del database relazionale (PostgreSQL) in caso di forte carico. | Stress test anticipati; Ottimizzazione delle query. |
-| **Sicurezza** | Vulnerabilità nella gestione dei permessi per le Board condivise (autorizzazione). | Revisione del codice approfondita sul middleware di autorizzazione (Role-Based Access Control). |
-| **Dipendenza** | La documentazione OpenAPI non viene aggiornata con le modifiche. | Implementazione di uno strumento di generazione automatica della documentazione. |
+| **Technical** | Insufficient initial scalability of the relational database (PostgreSQL) under heavy load. | Early stress testing; Query optimization; Evaluation of sharding/replication. |
+| **Security** | Vulnerabilities in permission management for shared Boards (authorization). | In-depth code review of the authorization middleware (Role-Based Access Control). |
+| **Dependency** | OpenAPI documentation not updated with code changes. | Implementation of an automatic documentation generation tool from code annotations. |
 
 ---
 
-## ✅ 9. Approvazioni
+## ✅ 9. Approvals
 
-| Nome | Ruolo | Firma | Data |
+| Name | Role | 
 |:---|:---|:---|:---|
-| | Product Manager | | |
-| | Tech Lead | | |
+| Luca Sacchi Ricciardi | CEO |
+| Matteo Fiorio | Team Leader |
+| Tommaso Villa | Member |
+| Samuele Piazzi | Member |
+| Filippo Granata | Member |
+| Samuele Gonnella | Member |
+| Corinna Buzzi | Member |
+| MariaLia Pero | Member |
+| Alessandro Cervini | Member |
+| Gloria Candela | Member |
