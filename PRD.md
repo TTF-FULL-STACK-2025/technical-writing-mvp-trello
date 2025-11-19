@@ -166,7 +166,7 @@ This document describes the requirements for developing a scalable, secure, and 
 ## ✅ 9. Approvals
 
 | Name | Role | 
-|:---|:---|:---|:---|
+|:---|:---|
 | Luca Sacchi Ricciardi | CEO |
 | Matteo Fiorio | Team Leader |
 | Tommaso Villa | Member |
