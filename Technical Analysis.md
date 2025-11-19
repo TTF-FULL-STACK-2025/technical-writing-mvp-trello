@@ -1,7 +1,7 @@
-# 💻 Technical Analysis: Core Backend for Project Management Platform (Trello-like)
+# 💻 Technical Analysis: Full-Stack Project Management Platform (Trello-like)
 
-**Project Title:** Core Backend for Project Management Platform (Trello-like) <br>
-**Version:** 1.0 <br>
+**Project Title:** Project Management Platform (Trello-like) <br>
+**Version:** 1.1 (Full-Stack Update) <br>
 **Date:** November 19, 2025 <br>
 **Author:** Team Work <br>
 **Approved by:** Luca Sacchi Ricciardi <br>
@@ -10,21 +10,29 @@
 
 ## 1. ⚙️ Architecture and Technology Stack
 
-The application will be a **Backend-only** (headless) system exposed via RESTful APIs, designed for **horizontal scalability** and an **API-first** approach.
+The application is designed as a **Full-Stack System** consisting of a RESTful API Backend and a modern Single Page Application (SPA) Frontend.
 
 ### 1.1 Recommended Technology Stack
 
-* **Backend Framework:** Node.js/Express or Python/FastAPI.
-* **Database (DB):** **PostgreSQL** (preferred for relational integrity) or MongoDB.
+#### Backend (API)
+* **Framework:** Node.js/Express or Python/FastAPI.
+* **Database (DB):** **PostgreSQL** (preferred for relational integrity).
 * **Authentication:** **JWT** (JSON Web Tokens).
-* **Containerization:** **Docker** and orchestration (e.g., Kubernetes) for high availability and scalability.
-* **Documentation:** **OpenAPI 3.x / Swagger UI**.
+* **Containerization:** Docker & Kubernetes.
+* **Documentation:** OpenAPI 3.x / Swagger UI.
+
+#### Frontend (Client)
+* **Framework:** **React** (v18+) with **TypeScript** for type safety.
+* **Build Tool:** Vite (for high-performance development).
+* **State Management:** **Zustand** or **Redux Toolkit** (for global client state) + **TanStack Query** (for server state synchronization).
+* **Styling:** **Tailwind CSS** (utility-first) for rapid UI development.
+* **Drag & Drop Engine:** **dnd-kit** or **react-beautiful-dnd** (specialized for Kanban interactions).
 
 ### 1.2 Architectural Principles
 
-* **Stateless Services:** The API service must be *stateless* to facilitate *scaling out* (horizontal scalability).
-* **API-First:** All functionalities are exposed via versioned RESTful APIs (`/api/v1/...`).
-* **Uptime Target:** Reliability guaranteed with an uptime target of **$\geq 99.5\%$**.
+* **Decoupled Architecture:** The Frontend and Backend are completely decoupled, communicating exclusively via RESTful APIs.
+* **Stateless Backend:** The API remains stateless to facilitate horizontal scaling.
+* **Optimistic UI:** The Frontend implements "Optimistic Updates" to ensure the interface feels instant (e.g., moving a card updates the UI immediately before the server confirms).
 
 ---
 
@@ -34,124 +42,128 @@ Security is based on robust authentication and a role-based authorization system
 
 ### 2.1 Authentication (JWT)
 
-* **Flow:** The user logs in (`POST /auth/login`) and receives a **JWT Bearer Token**. All subsequent requests must include this token.
+* **Flow:** The user logs in (`POST /auth/login`) and receives a **JWT Bearer Token**. The Frontend stores this securely (e.g., HttpOnly Cookie or memory) and attaches it to API headers.
 * **Password Protection:** Passwords must be stored using **strong hashing** (e.g., bcrypt/argon2).
-* **Password Recovery:** Secure flow managed via a single-use token and email service (FR4, FR5).
-* **Rate Limiting:** Implemented to prevent brute-force attacks on login and registration (BR11).
+* **Rate Limiting:** Implemented on API to prevent brute-force attacks.
 
 ### 2.2 Authorization (Role-Based Access Control - RBAC)
 
-Permissions are applied at the Board level, verifying that the user is a member and has the appropriate role for the requested action.
+Permissions are applied at the Board level.
 
 | Role | Permissions | Example Functions |
 |:---|:---|:---|
-| **Owner** | Full control over the board, members, and content. Cannot be removed by others. | Creation (FR7), Modification (FR8), Board Deletion (FR9), Member Management (FR10) |
-| **Editor** | Creation and modification of content (Lists, Cards, Comments, Assignments). | List Creation/Modification (FR11, FR12), Card Creation/Modification (FR15, FR16, FR20) |
-| **Viewer** | Read-only access to board content and the Activity Log (FR26). | Board Viewing |
+| **Owner** | Full control over the board, members, and content. | Board Deletion (FR9), Member Management (FR10) |
+| **Editor** | Creation and modification of content. | List/Card Creation, Drag & Drop operations |
+| **Viewer** | Read-only access to board content. | Board Viewing |
 
 ---
 
-## 3. 💾 Data Model and Core Functionalities
+## 3. 💾 Data Model and Core Functionalities (Backend)
 
-The data model must support the hierarchical organization and defined operations: `Board` $\rightarrow$ `List` $\rightarrow$ `Card`.
+The data model supports the hierarchy: `Board` $\rightarrow$ `List` $\rightarrow$ `Card`.
 
-### 3.1 CRUD Operations and Structure
+### 3.1 CRUD Operations
 
 | Entity | Key Operations (FR) | Technical Notes |
 |:---|:---|:---|
-| **Board** | CRUD (FR7, FR8, FR9), Member Management (FR10) | Contains `ownerId` field and `archived/deleted` status. |
-| **List** | CRUD, Reordering (FR14, FR13) | Must support a `position` field for ordering within the Board. |
-| **Card** | CRUD, Move/Reorder (FR20), Assignments (FR17), Due Date (FR18), Labels (FR19), Comments (FR22, FR23), Attachment Metadata (FR24) | `Move` between lists requires updating `listId` and `position`. |
-| **Activity Log** | Tracking (FR25), Retrieval (FR26) | Immutable. Records modifications to Boards, Lists, Cards, Comments. |
+| **Board** | CRUD, Member Management | Root entity. |
+| **List** | CRUD, Reordering | Must support `position` (float/integer) for ordering. |
+| **Card** | CRUD, Move/Reorder, Assignments | `Move` changes `listId` and `position`. |
 
 ### 3.2 Consistency Requirements
 
-* **Archiving Consistency:** Archiving a Board results in the logical cascading archive (**soft delete**) of its related Lists and Cards.
-* **Unique Email:** The user's email address must be unique (BR1).
+* **Soft Delete:** Archiving entities results in a soft delete (flag update), not physical removal.
 
 ---
 
-## 4. 🚀 Performance, Logistics, and DevOps
+## 4. 🖥️ Frontend Architecture & User Experience
 
-### 4.1 Performance (NFR)
+### 4.1 Component Structure
+The UI is built using reusable atomic components.
+* **Layouts:** Authenticated Layout (Sidebar + Topbar) vs Public Layout (Login/Register).
+* **Kanban Board:** A horizontal scrollable container holding `List` components.
+* **Draggables:** `Card` components must be wrapped in draggable providers.
 
-* **API Latency:** Average API response latency must be **$<300$ms**.
-* **DB Optimization:** Queries and schemas must be optimized for high concurrency. **Sharding/replication** strategies for PostgreSQL will be evaluated in case of aggressive load.
+### 4.2 Drag and Drop Logic (Complex Interaction)
+The core "Trello-feel" relies on the Drag and Drop (DnD) implementation.
 
-### 4.2 DevOps and Observability
+* **Library:** Use `dnd-kit` for accessibility and performance.
+* **Logic:**
+    1.  **OnDragStart:** Capture the card ID and original position.
+    2.  **OnDragOver:** Calculate potential new index visually (Client-side calculation).
+    3.  **OnDragEnd:**
+        * **Optimistic Update:** Immediately update the local state to reflect the move.
+        * **API Call:** Send `PUT /cards/{id}/move` with `newListId` and `newPosition`.
+        * **Rollback:** If the API fails (non-200 status), revert the UI to the original state and show a generic error toast.
 
-* **CI/CD:** Automated pipeline for testing and deployment (via Docker).
-* **Logging:** Implementation of a centralized logging system (e.g., ELK Stack) for monitoring and troubleshooting.
-* **Health Check:** `/health` and `/status` endpoints for monitoring by orchestrators and load balancers (FR29).
-* **Backup:** Automated and tested backup strategy for the database.
+### 4.3 State Management Strategy
+* **Server State (React Query):** Used for fetching Boards, Lists, and Cards. Handles caching, background refetching, and stale data invalidation.
+* **Global UI State (Zustand):** Used for managing sidebar toggle, current modal open/close state, and user session data.
 
 ---
 
-## 5. 🛠️ API Specifications and Integration Flows
+## 5. 🚀 Performance, Logistics, and DevOps
 
-### 5.1 API Conventions
+### 5.1 Performance (NFR)
 
-* **Standard:** REST over HTTPS, JSON payload.
-* **Base URL:** `/api/v1`.
-* **Documentation:** Accessible via `GET /api-docs` (Swagger UI), always synchronized with the code.
-* **Error Handling:** Consistent use of standard HTTP status codes (e.g., `400 Bad Request` for validation, `401 Unauthorized`, `403 Forbidden` for insufficient permissions).
+* **API Latency:** Average $<300$ms.
+* **Frontend Bundle Size:** Initial load chunk should be **$<500$KB** (Gzipped). Lazy loading used for non-critical routes.
+* **Rendering:** Prevent unnecessary re-renders in the Kanban board using `React.memo` or virtualization if lists exceed 50+ cards.
 
-### 5.2 Key Endpoint Examples
+### 5.2 DevOps
 
-| Functionality | Method | Endpoint | Related Requirements (FR) |
+* **CI/CD:**
+    * **Backend:** Docker builds + Tests.
+    * **Frontend:** Build + Lint + Deploy to CDN/Static Host (e.g., Vercel, Netlify, AWS S3).
+* **Monitoring:** Sentry (or similar) for Frontend error tracking.
+
+---
+
+## 6. 🛠️ API Specifications (Integration)
+
+* **Base URL:** `/api/v1`
+* **CORS:** Backend must be configured to allow requests from the Frontend domain.
+* **Error Handling:** Frontend intercepts `401` errors to trigger logout or token refresh.
+
+---
+
+## 7. ✅ Metrics and Success Criteria
+
+### 7.1 Key KPIs
+
+* **Average API Response Time:** $<300$ms.
+* **First Contentful Paint (FCP):** Frontend loads in **$<1.5$s**.
+* **Interaction to Next Paint (INP):** Drag and drop interactions must feel instant ($<200$ms).
+
+---
+
+## 8. 📅 Planning and Deliverables
+
+The project is divided into five main Phases (11 Weeks).
+
+| Phase | Backend Activity | Frontend Activity | Main Deliverables |
 |:---|:---|:---|:---|
-| Authentication | `POST` | `/v1/auth/login` | FR2 |
-| Board Creation | `POST` | `/v1/boards` | FR7 |
-| Member Management | `POST/PUT/DELETE` | `/v1/boards/{boardId}/members` | FR10 |
-| Card Creation | `POST` | `/v1/lists/{listId}/cards` | FR15 |
-| Card Movement | `PUT` | `/v1/cards/{cardId}/move` | FR20 |
-| Activity Log | `GET` | `/v1/boards/{boardId}/activity` | FR26 |
+| **Phase 1** (2 Weeks) | Architecture, Auth API, DB Setup | Project Init, UI Kit Setup, Login/Register Pages | Auth Flow (E2E), Repository Setup |
+| **Phase 2** (3 Weeks) | Board/List CRUD, RBAC Middleware | Dashboard Layout, Board Creation, Board View | Board Management, Role Handling UI |
+| **Phase 3** (3 Weeks) | Card CRUD, Move Logic, Comments | **Drag & Drop Implementation**, Card Modals | **Functional Kanban Board** |
+| **Phase 4** (2 Weeks) | Activity Log, Notifications, Metadata | Activity Sidebar, Notifications UI, Attachment UX | Complete User Experience |
+| **Phase 5** (1 Week) | Security Hardening, API Freeze | Performance Tuning, Bundle Optimization, E2E Tests | Production Deployment |
 
 ---
 
-## 6. ✅ Metrics and Success Criteria
-
-The success of the backend will be evaluated based on achieving the following KPIs (Key Performance Indicators).
-
-### 6.1 Key KPIs
-
-* **Average API Response Time (AART):** Average **$<300$ms**.
-* **Board Creation Success Rate:** Success rate for Board creation $\rightarrow$ **$100\%$** (zero critical errors).
-* **Critical Vulnerability Count:** Number of critical vulnerabilities detected in security tests $\rightarrow$ **Zero**.
-
-### 6.2 Secondary Metrics
-
-* **Error Rate:** Percentage of API requests returning $5xx$ status codes $\rightarrow$ **$<0.1\%$**.
-* **Test Coverage:** Unit and integration test coverage $\rightarrow$ **$>80\%$**.
-
----
-
-## 7. 📅 Planning and Deliverables
-
-The project is divided into five main Phases, with a total estimated duration of **11 weeks**.
-
-| Phase | Activity | Estimated Duration | Main Deliverables |
-|:---|:---|:---|:---|
-| **Phase 1** | Architecture Setup, Authentication (JWT, Auth) | **2 Weeks** | Functioning Registration/Login flows, DB Baseline, Project Structure |
-| **Phase 2** | Board and List Management (CRUD, Members, Roles) | **3 Weeks** | Complete CRUD APIs for Boards and Lists; RBAC Management (Owner/Editor/Viewer) |
-| **Phase 3** | Card and Comment Management (CRUD, Move, Date, Label) | **3 Weeks** | Complete CRUD APIs for Cards and Comments; Card Movement/Reordering Logic (FR20) |
-| **Phase 4** | Activity Log, Basic Notifications, Metadata Upload | **2 Weeks** | Logging Service (FR25) and Notifications (FR27); Attachment Metadata API (FR24) |
-| **Phase 5** | Security Hardening, Final Testing, Documentation, Deployment | **1 Week** | Penetration Test, Final Performance Tuning; Complete OpenAPI 3.x Documentation |
-
----
-
-## 8. ⚠️ Risks and Mitigation
+## 9. ⚠️ Risks and Mitigation
 
 | Type | Description | Mitigation |
 |:---|:---|:---|
-| **Technical** | Insufficient DB scalability (PostgreSQL) under heavy load. | Early stress testing; Query optimization; Evaluation of sharding/replication. |
-| **Security** | Vulnerabilities in permission management (Authorization). | In-depth code review of the authorization middleware (RBAC). |
-| **Dependency** | OpenAPI documentation not updated with code changes. | Implementation of an automatic documentation generation tool from code annotations. |
+| **UX/Technical** | "Janky" Drag and Drop on mobile devices. | Use `touch-action: none` CSS properties and test specifically on iOS/Android touch events. |
+| **Data Integrity** | Race conditions when two users move the same card. | Backend handles concurrency; Frontend uses WebSockets or Polling for near-real-time updates. |
+| **Security** | XSS attacks via User Comments. | Sanitize all Markdown/HTML input on both Client and Server. |
 
+---
 
-## ✅ 9. Approvals
+## ✅ 10. Approvals
 
-| Name | Role | 
+| Name | Role |
 |:---|:---|
 | Luca Sacchi Ricciardi | CEO |
 | Matteo Fiorio | Team Leader |
