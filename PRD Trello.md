@@ -1,184 +1,171 @@
-*Product Requirement Document (PRD) – Backend Trello-like System*
+# 🧭 Product Requirements Document (PRD) – Backend Trello-like System
 
-1. *Introduction*  
-    *This document describes the requirements for the development of a backend-only system similar to Trello, including all basic functionalities necessary for the management of boards, lists, tasks (cards), and users.*
+**Titolo del progetto:** Backend Core per Piattaforma di Gestione Progetti (Trello-like) <br>
+**Versione:** 1.0<br>
+**Data:** 19/11/2025<br>
+**Autore:** Team Work<br>
+**Approvato da:** Luca Sacchi Ricciardi
 
-2. *Project Objectives*
+---
 
-* *Develop a scalable, secure, and high-performing backend.*
+## 🧱 1. Overview
 
-* *Support all core features of Trello’s basic version.*
+### 1.1 Descrizione generale
 
-* *Provide complete RESTful APIs for future frontend integration.*
+Questo documento descrive i requisiti per lo sviluppo di un **sistema backend-only** scalabile, sicuro e performante, che emuli le funzionalità di base di una piattaforma di gestione progetti in stile Trello. Il sistema fornirà le API RESTful necessarie per gestire utenti, board, liste, card (task) e la collaborazione, escludendo qualsiasi sviluppo di interfaccia utente.
 
-* *Enable user management, authentication, authorization, and collaboration.*
+### 1.2 Contesto / Motivazione
 
-3. *Scope*
+* **Problema Utente:** Le organizzazioni e i team necessitano di una piattaforma flessibile e centralizzata per tracciare il lavoro, gestire i flussi e facilitare la collaborazione sui task.
+* **Obiettivi Aziendali:** Creare un solido backend come base per future applicazioni (web/mobile), garantendo **scalabilità** e **performance** elevate fin dall'inizio per supportare una rapida crescita.
+* **Insight:** L'architettura deve essere **API-first** per consentire integrazioni future e uno sviluppo frontend disaccoppiato.
 
-### ***Inclusions***
+### 1.3 Obiettivi principali
 
-* *User account management and authentication.*
+* **Sviluppare un backend** scalabile, sicuro e ad alte prestazioni (API call $<300$ms).
+* **Supportare tutte le funzionalità core** di un sistema di gestione task (CRUD per Board, Liste, Card, Utenti).
+* **Fornire API RESTful complete** e ben documentate (OpenAPI 3.x).
+* **Abilitare la gestione di utenti, autenticazione e autorizzazione** per la collaborazione.
 
-* *Creation and management of boards, lists, and cards.*
+### 1.4 Non obiettivi (Out of Scope)
 
-* *Permission management and board sharing.*
+* Interfaccia Utente / Frontend di qualsiasi tipo.
+* Funzionalità avanzate tipo Power-Ups, automazioni complesse o template di board.
+* Integrazioni con sistemi esterni (Slack, GitHub, ecc.).
+* Gestione fisica di file per gli allegati (solo metadata).
 
-* *Comments, labels, due dates, and card activity tracking.*
+---
 
-* *Activity logging and basic notifications.*
+## 🎯 2. Target & Utente
 
-### ***Exclusions***
+### 2.1 Personas principali
 
-* *Advanced features (power-ups, complex automations).*
+* **Marco (Developer Backend):** Ruolo: Implementatore del sistema. Bisogno: API chiare, stabili e ben documentate per la facile integrazione con il frontend. Pain Point: Documentazione API obsoleta o incompleta.
+* **Laura (Project Manager):** Ruolo: Utilizzatore finale (tramite futuro frontend). Bisogno: Gestire i flussi di lavoro, assegnare task e tracciare lo stato di avanzamento. Obiettivo: Avere uno strumento affidabile per la pianificazione e l'esecuzione.
+* **Giovanni (Amministratore di Sistema):** Ruolo: Garante dell'infrastruttura. Bisogno: Sistema scalabile, monitorabile e con un'architettura manutenibile.
 
-* *UI/Frontend.*
+### 2.2 Use cases / Scenari
 
-* *Integrations with external systems.*
+* **Scenario 1: Setup Iniziale del Team:** Un nuovo utente si registra, crea una nuova Board, e aggiunge i membri del suo team assegnando loro il ruolo di `Editor`.
+* **Scenario 2: Gestione del Task:** Un membro del team crea una Card, la sposta tra Liste, aggiunge una `Due Date` e assegna un `Label`. Un altro membro aggiunge un `Commento`.
+* **Scenario 3: Audit:** L'Owner della Board verifica l'attività recente sulla Board attraverso il log degli eventi.
 
-4. *Functional Requirements*
+---
 
-### ***4.1 User Management***
+## 🧩 3. Requisiti di prodotto
 
-* *User registration (email, password).*
+### 3.1 Functional Requirements (Funzionali)
 
-* *Login/logout.*
+| ID | Nome | Descrizione | Priorità (MoSCoW) | Note |
+|:---|:---|:---|:---|:---|
+| FR1.1 | Registrazione Utente | L'utente deve potersi registrarsi con email e password. | Must | |
+| FR1.2 | Login/Logout | Gestione sessione e autenticazione tramite credenziali. | Must | Uso di JWT. |
+| FR1.3 | Gestione Board | CRUD completo per le Board (Creazione, Modifica, Archiviazione/Eliminazione). | Must | |
+| FR1.4 | Gestione Liste | CRUD e riordinamento delle Liste all'interno di una Board. | Must | |
+| FR1.5 | Gestione Card | CRUD e modifica di titolo, descrizione, assegnatari, due date, label. | Must | |
+| FR1.6 | Spostamento Card | Possibilità di riordinare le Card e spostarle tra Liste diverse. | Must | |
+| FR1.7 | Commenti | Aggiunta ed eliminazione di commenti sulle Card. | Should | |
+| FR1.8 | Membri Board | Aggiunta, rimozione e gestione dei ruoli (`Owner`, `Editor`, `Viewer`). | Must | |
+| FR1.9 | Log Attività | Tracciamento delle modifiche (CRUD) su Board, Liste e Card. | Must | |
+| FR1.10 | Notifiche Base | Notifiche per assegnazione Card. | Should | |
 
-* *Password recovery.*
+### 3.2 Non-Functional Requirements (Non Funzionali)
 
-* *Profile editing (name, avatar).*
+| Tipo | Descrizione | Misura/Esempio |
+|:---|:---|:---|
+| **Performance** | Bassa latenza delle risposte API. | Tempo di risposta medio $<300$ms. |
+| **Scalabilità** | Capacità di gestire un aumento del carico di lavoro. | Architettura che supporti la scalabilità orizzontale. |
+| **Sicurezza** | Protezione dei dati e delle comunicazioni. | Autenticazione JWT, crittografia password, rate limiting. |
+| **Affidabilità** | Disponibilità e continuità del servizio. | $99.5\%$ di uptime. Implementazione di una strategia di backup. |
+| **Documentazione** | API chiare e auto-documentate. | Uso di Swagger/OpenAPI 3.x per la documentazione automatica. |
 
-### ***4.2 Boards***
+---
 
-* *Create board.*
+## 🧠 4. User Experience / Design
 
-* *Edit board name and description.*
+### 4.1 Flusso utente (User Flow)
 
-* *Archive/delete board.*
+1.  **Registrazione:** Utente $\rightarrow$ `POST /register` $\rightarrow$ Riceve token JWT.
+2.  **Board Setup:** Utente $\rightarrow$ `POST /boards` $\rightarrow$ `POST /boards/{id}/members` (aggiunta membri) $\rightarrow$ `POST /boards/{id}/lists`.
+3.  **Task Management:** Utente $\rightarrow$ `POST /lists/{id}/cards` $\rightarrow$ `PATCH /cards/{id}` (spostamento/modifica) $\rightarrow$ `POST /cards/{id}/comments`.
 
-* *Manage members (invitations, roles: owner/editor/viewer).*
+### 4.2 Wireframe / Mockup
 
-### ***4.3 Lists***
+> *Non applicabile per un progetto strettamente Backend-only.*
 
-* *Create list within a board.*
+### 4.3 Copy & Tone of Voice
 
-* *Edit list name.*
+> *Tutti i messaggi di errore (status code HTTP) e di validazione devono essere chiari e standardizzati.*
 
-* *Reorder lists.*
+---
 
-* *Archive/delete list.*
+## ⚙️ 5. Architettura tecnica / API
 
-### ***4.4 Cards (Tasks)***
+### 5.1 Dipendenze tecniche
 
-* *Create card.*
+* **Backend:** Node.js/Express o Python/FastAPI (scelta raccomandata).
+* **Database:** PostgreSQL (preferito) o MongoDB.
+* **Autenticazione:** OAuth2/JWT Bearer Token.
+* **Containerizzazione:** Docker.
 
-* *Edit title and description.*
+### 5.2 Endpoint previsti (se rilevante)
 
-* *Assign users.*
+| Endpoint | Metodo | Descrizione | Input | Output |
+|:---|:---|:---|:---|:---|
+| `/v1/auth/login` | POST | Autenticazione utente | email, password | JWT Token |
+| `/v1/boards` | POST | Crea una nuova Board | nome, descrizione | ID Board |
+| `/v1/boards/{id}/lists` | POST | Aggiunge una Lista alla Board | nome | ID Lista |
+| `/v1/cards` | POST | Crea una Card in una Lista | titolo, descrizione, ID Lista | ID Card |
+| `/v1/cards/{id}/move` | PATCH | Sposta una Card | ID nuova Lista, posizione | Status 200 |
 
-* *Add due date.*
+### 5.3 Considerazioni DevOps / Scalabilità
 
-* *Add labels.*
+* **Scalabilità:** Design dell'applicazione e del database per supportare la scalabilità orizzontale.
+* **CI/CD:** Pipeline automatizzata per test e deploy (tramite Docker).
+* **Logging:** Implementazione di un sistema di logging centralizzato (es. ELK Stack) per il monitoraggio.
 
-* *Reorder and move cards between lists.*
+---
 
-* *Archive/delete card.*
+## 🧪 6. Metriche e Success Criteria
 
-### ***4.5 Comments & Attachments***
+### 6.1 KPI principali
 
-* *Add comments to cards.*
+* **Board Creation Success Rate:** Tasso di successo nella creazione di Board $\rightarrow$ $100\%$ (zero errori critici).
+* **Average API Response Time (AART):** Tempo medio di risposta delle API $\rightarrow <300$ms.
+* **Critical Vulnerability Count:** Numero di vulnerabilità critiche rilevate $\rightarrow$ Zero.
 
-* *Delete comments.*
+### 6.2 Metriche secondarie
 
-* *Upload attachments (metadata only if physical storage is excluded).*
+* **Error Rate:** Percentuale di richieste API che ritornano status code $5xx \rightarrow <0.1\%$.
+* **Test Coverage:** Copertura dei test unitari e di integrazione $\rightarrow >80\%$.
 
-### ***4.6 Activity & Notifications***
+---
 
-* *Track activity (CRUD on boards/lists/cards).*
+## 📅 7. Pianificazione e Scadenze
 
-* *Basic notifications (e.g., card assignment).*
+| Fase | Attività | Responsabile | Data inizio | Data fine |
+|:---|:---|:---|:---|:---|
+| **Fase 1** | Setup Architettura, Autenticazione (JWT, Auth) | Dev team | [Da definire] | 2 Settimane |
+| **Fase 2** | Gestione Board e Liste (CRUD, Membri, Ruoli) | Dev team | [Dopo Fase 1] | 3 Settimane |
+| **Fase 3** | Gestione Card e Commenti (CRUD, Spostamento, Due Date, Label) | Dev team | [Dopo Fase 2] | 3 Settimane |
+| **Fase 4** | Activity Log, Notifiche Base, Upload Metadata | Dev team | [Dopo Fase 3] | 2 Settimane |
+| **Fase 5** | Hardening Sicurezza, Testing Finale, Documentazione, Deployment | Dev team | [Dopo Fase 4] | 1 Settimana |
 
-5. *Non-Functional Requirements*
+---
 
-* *Performance: \<300ms per API call.*
+## ⚠️ 8. Rischi e Dipendenze
 
-* *Scalability: horizontal scalability.*
+| Tipo | Descrizione | Mitigazione |
+|:---|:---|:---|
+| **Tecnico** | Insufficiente scalabilità iniziale del database relazionale (PostgreSQL) in caso di forte carico. | Stress test anticipati; Ottimizzazione delle query. |
+| **Sicurezza** | Vulnerabilità nella gestione dei permessi per le Board condivise (autorizzazione). | Revisione del codice approfondita sul middleware di autorizzazione (Role-Based Access Control). |
+| **Dipendenza** | La documentazione OpenAPI non viene aggiornata con le modifiche. | Implementazione di uno strumento di generazione automatica della documentazione. |
 
-* *Security: JWT, encrypted passwords, rate limiting.*
+---
 
-* *Reliability: 99.5% uptime, backup.*
+## ✅ 9. Approvazioni
 
-* *API Documentation: Swagger/OpenAPI.*
-
-6. *API*
-
-* *RESTful APIs compliant with **OpenAPI 3.x**, documented using **Swagger UI**.*
-
-* *Automatic documentation generation via annotations or YAML/JSON file.*
-
-* *Versioning (e.g., `/api/v1`).*
-
-* *Authentication via JWT Bearer Token verified through middleware.*
-
-* *Input/output validation compliant with OpenAPI schema.*
-
-* *Endpoints also accessible via automatically generated SDKs from OpenAPI.*
-
-7. *Database & Architecture*
-
-* *Relational or NoSQL database (preferably PostgreSQL or MongoDB).*
-
-* *Entity-relationship model.*
-
-* *Optional microservices (base monolithic architecture).*
-
-8. *Roles & Permissions*
-
-* *Owner: full control.*
-
-* *Editor: content modification.*
-
-* *Viewer: read-only access.*
-
-9. *Main Flows*
-
-* *User registration and authentication.*
-
-* *Board creation → Member addition → List creation → Card creation.*
-
-* *Real-time logs and updates via optional webhooks/sockets.*
-
-10. *Success KPIs*
-
-* *Successful board creation without errors.*
-
-* *Average API response time.*
-
-* *Number of tasks managed.*
-
-* *Zero critical vulnerabilities.*
-
-11. *Development Roadmap*  
-     *| Phase | Duration | Activities |*  
-     *|-------|----------|------------|*  
-     *| 1 | 2 weeks | Architecture setup, authentication |*  
-     *| 2 | 3 weeks | Board and list management |*  
-     *| 3 | 3 weeks | Card and comment management |*  
-     *| 4 | 2 weeks | Activity log, notifications |*  
-     *| 5 | 1 week | Hardening, testing, and deployment |*
-
-12. *Risks*
-
-* *Insufficient initial scalability.*
-
-* *Security issues with shared board access.*
-
-13. *Recommended Technologies*
-
-* ***Backend**: Node.js/Express or Python FastAPI.*
-
-* ***Database**: PostgreSQL or MongoDB.*
-
-* ***Auth**: OAuth2/JWT.*
-
-* ***Containerization**: Docker \+ orchestrator.*
-
+| Nome | Ruolo | Firma | Data |
+|:---|:---|:---|:---|
+| | Product Manager | | |
+| | Tech Lead | | |
