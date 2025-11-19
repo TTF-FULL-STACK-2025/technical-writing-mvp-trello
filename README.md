@@ -2,11 +2,11 @@
 Status: MVP in development — documentation updated as components are delivered.
 \[Foto del progetto quando disponibile]
 ## Table of contents:
- 1. [[README.md#Overview|Overview]]
- 2. [[README.md#Documentation|Documentation]]
- 3. [[README.md#Project Summary|Project Summary]]
- 4. [[README.md#Project Goals|Project Goals]]
- 5. [[README.md#Team Management|Team Management]]
+ 1. Overview
+ 2. Documentation
+ 3. Project Summary
+ 4. Goals
+ 5. Team Management
 ## Overview
 Technical Writing Project - Trello-like app backend dev with tech docs
 **Current Version:** 1.0  
