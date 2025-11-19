@@ -10,7 +10,7 @@
 
 ## 🧱 1. Overview
 
-### 1.1 General Description
+### 1.1 General Descriptionp
 
 This document describes the requirements for developing a scalable, secure, and high-performing **backend-only system** that emulates the core functionalities of a Trello-style project management platform. The system will provide the necessary RESTful APIs to manage users, boards, lists, cards (tasks), and collaboration, excluding any user interface development.
 
