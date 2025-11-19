@@ -1,188 +1,134 @@
-# **Product Requirement Document (PRD) – Backend Trello-like System**
+Product Requirement Document (PRD) -- Backend Trello-like System
 
-## **1\. Introduzione**
+1.  Introduction This document describes the requirements for the
+    development of a backend-only system similar to Trello, including
+    all basic functionalities necessary for the management of boards,
+    lists, tasks (cards), and users.
 
-Il presente documento descrive i requisiti per lo sviluppo esclusivamente backend di un sistema tipo Trello, con tutte le funzionalità di base necessarie alla gestione di board, liste, task (card) e utenti.
+2.  Project Objectives
 
-## **2\. Obiettivi del Progetto**
+-   Develop a scalable, secure, and high-performing backend.
+-   Support all core features of Trello's basic version.
+-   Provide complete RESTful APIs for future frontend integration.
+-   Enable user management, authentication, authorization, and
+    collaboration.
 
-* Sviluppare un backend scalabile, sicuro e performante.
+3.  Scope \### Inclusions
 
-* Supportare tutte le funzionalità principali della versione base di Trello.
+-   User account management and authentication.
+-   Creation and management of boards, lists, and cards.
+-   Permission management and board sharing.
+-   Comments, labels, due dates, and card activity tracking.
+-   Activity logging and basic notifications.
 
-* Garantire API RESTful complete per integrazione futura con frontend.
+### Exclusions
 
-* Prevedere gestione utenti, autenticazione, autorizzazioni e collaborazione.
+-   Advanced features (power-ups, complex automations).
+-   UI/Frontend.
+-   Integrations with external systems.
 
-## **3\. Scope**
+4.  Functional Requirements \### 4.1 User Management
 
-### **Inclusioni**
+-   User registration (email, password).
+-   Login/logout.
+-   Password recovery.
+-   Profile editing (name, avatar).
 
-* Gestione account e autenticazione.
+### 4.2 Boards
 
-* Creazione e gestione di board, liste e card.
+-   Create board.
+-   Edit board name and description.
+-   Archive/delete board.
+-   Manage members (invitations, roles: owner/editor/viewer).
 
-* Gestione permessi e condivisione board.
+### 4.3 Lists
 
-* Commenti, etichette, scadenze e attività sulle card.
+-   Create list within a board.
+-   Edit list name.
+-   Reorder lists.
+-   Archive/delete list.
 
-* Logging attività e notifiche base.
+### 4.4 Cards (Tasks)
 
-### **Esclusioni**
+-   Create card.
+-   Edit title and description.
+-   Assign users.
+-   Add due date.
+-   Add labels.
+-   Reorder and move cards between lists.
+-   Archive/delete card.
 
-* Funzionalità avanzate (power-ups, automazioni complesse).
+### 4.5 Comments & Attachments
 
-* UI/Frontend.
+-   Add comments to cards.
+-   Delete comments.
+-   Upload attachments (metadata only if physical storage is excluded).
 
-* Integrazioni con sistemi esterni.
+### 4.6 Activity & Notifications
 
-## **4\. Requisiti Funzionali**
+-   Track activity (CRUD on boards/lists/cards).
+-   Basic notifications (e.g., card assignment).
 
-### **4.1 Gestione Utenti**
+5.  Non-Functional Requirements
 
-* Registrazione utente (email, password).
+-   Performance: \<300ms per API call.
+-   Scalability: horizontal scalability.
+-   Security: JWT, encrypted passwords, rate limiting.
+-   Reliability: 99.5% uptime, backup.
+-   API Documentation: Swagger/OpenAPI.
 
-* Login/logout.
+6.  API
 
-* Recupero password.
+-   RESTful APIs compliant with **OpenAPI 3.x**, documented using
+    **Swagger UI**.
+-   Automatic documentation generation via annotations or YAML/JSON
+    file.
+-   Versioning (e.g., `/api/v1`).
+-   Authentication via JWT Bearer Token verified through middleware.
+-   Input/output validation compliant with OpenAPI schema.
+-   Endpoints also accessible via automatically generated SDKs from
+    OpenAPI.
 
-* Modifica profilo (nome, avatar).
+7.  Database & Architecture
 
-### **4.2 Board**
+-   Relational or NoSQL database (preferably PostgreSQL or MongoDB).
+-   Entity-relationship model.
+-   Optional microservices (base monolithic architecture).
 
-* Creazione board.
+8.  Roles & Permissions
 
-* Modifica nome e descrizione.
+-   Owner: full control.
+-   Editor: content modification.
+-   Viewer: read-only access.
 
-* Archiviazione/eliminazione board.
+9.  Main Flows
 
-* Gestione membri (inviti, ruoli: owner/editor/viewer).
+-   User registration and authentication.
+-   Board creation → Member addition → List creation → Card creation.
+-   Real-time logs and updates via optional webhooks/sockets.
 
-### **4.3 Liste**
+10. Success KPIs
 
-* Creazione lista all'interno di una board.
+-   Successful board creation without errors.
+-   Average API response time.
+-   Number of tasks managed.
+-   Zero critical vulnerabilities.
 
-* Modifica nome lista.
+11. Development Roadmap \| Phase \| Duration \| Activities \|
+    \|-------\|----------\|------------\| \| 1 \| 2 weeks \|
+    Architecture setup, authentication \| \| 2 \| 3 weeks \| Board and
+    list management \| \| 3 \| 3 weeks \| Card and comment management \|
+    \| 4 \| 2 weeks \| Activity log, notifications \| \| 5 \| 1 week \|
+    Hardening, testing, and deployment \|
 
-* Riordinamento liste.
+12. Risks
 
-* Archiviazione/eliminazione lista.
+-   Insufficient initial scalability.
+-   Security issues with shared board access.
 
-### **4.4 Card (Task)**
+13. Recommended Technologies
 
-* Creazione card.
-
-* Modifica titolo e descrizione.
-
-* Assegnazione utenti.
-
-* Aggiunta scadenza (due date).
-
-* Aggiunta etichette.
-
-* Riordinamento e spostamento tra liste.
-
-* Archiviazione/eliminazione card.
-
-### **4.5 Commenti & Attachments**
-
-* Aggiunta commenti alle card.
-
-* Eliminazione commenti.
-
-* Upload allegati (solo metadati se escluso storage fisico).
-
-### **4.6 Attività & Notifiche**
-
-* Tracking attività (CRUD su board/liste/card).
-
-* Notifiche base (es. assegnazione card).
-
-## **5\. Requisiti Non Funzionali**
-
-* **Performance**: \<300ms per singola chiamata API.
-
-* **Scalabilità**: sistemi orizzontali.
-
-* **Sicurezza**: JWT, password cifrate, rate limiting.
-
-* **Affidabilità**: uptime 99,5%, backup.
-
-* **Documentazione API**: Swagger/OpenAPI.
-
-## **6\. API**
-
-* API RESTful conformi a standard **OpenAPI 3.x**, documentate tramite **Swagger UI**.
-
-* Generazione automatica della documentazione tramite annotazioni o file YAML/JSON.
-
-* Versionamento (es. `/api/v1`).
-
-* Autenticazione via Bearer Token JWT verificata tramite middleware.
-
-* Validazione input/output conforme allo schema OpenAPI.
-
-* Endpoint accessibili anche via SDK generati automaticamente da OpenAPI.
-
-## **7\. Database & Architettura Database & Architettura**
-
-* DB relazionale o NoSQL (preferibilmente PostgreSQL o MongoDB).
-
-* Modello entità-relazioni.
-
-* Microservizi opzionali (base monolite).
-
-## **8\. Ruoli e Permessi**
-
-* Owner: pieno controllo.
-
-* Editor: modifica contenuti.
-
-* Viewer: sola lettura.
-
-## **9\. Flussi Principali**
-
-* Registrazione e autenticazione.
-
-* Creazione board → Aggiunta membri → Creazione liste → Creazione card.
-
-* Logs & aggiornamenti in tempo reale tramite webhook/Socket opzionali.
-
-## **10\. KPI Successo**
-
-* Creazione board senza errori.
-
-* Tempo medio risposta API.
-
-* Numero task gestiti.
-
-* Zero vulnerabilità critiche.
-
-## **11\. Roadmap di Sviluppo**
-
-| Fase | Durata | Attività |
-| ----- | ----- | ----- |
-| 1 | 2 settimane | Setup architettura, autenticazione |
-| 2 | 3 settimane | Gestione Board e Liste |
-| 3 | 3 settimane | Gestione Card e Commenti |
-| 4 | 2 settimane | Activity Log, notifica |
-| 5 | 1 settimana | Hardening, test e deployment |
-
-## **12\. Rischi**
-
-* Scalabilità iniziale insufficiente.
-
-* Problemi sicurezza accessi board condivise.
-
-## **13\. Tecnologie Consigliate**
-
-* **Backend**: Node.js/Express o Python FastAPI.
-
-* **DB**: PostgreSQL o MongoDB.
-
-* **Auth**: OAuth2/JWT.
-
-* **Container**: Docker \+ orchestrator.
-
----
-
+-   **Backend**: Node.js/Express or Python FastAPI.
+-   **Database**: PostgreSQL or MongoDB.
+-   **Auth**: OAuth2/JWT.
+-   **Containerization**: Docker + orchestrator.
