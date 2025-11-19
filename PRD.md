@@ -1,10 +1,10 @@
 # 🧭 Product Requirements Document (PRD) – Trello-like Backend System
 
-**Project Title:** Core Backend for Project Management Platform (Trello-like)
-**Version:** 1.0
-**Date:** November 19, 2025
-**Author:** AI Assistant
-**Approved by:** [To be defined]
+**Project Title:** Core Backend for Project Management Platform (Trello-like) <br>
+**Version:** 1.0 <br>
+**Date:** November 19, 2025 <br>
+**Author:** Team Work <br>
+**Approved by:** Luca Sacchi Ricciardi <br>
 
 ---
 
