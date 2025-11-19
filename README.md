@@ -10,7 +10,7 @@ Status: MVP in development — documentation updated as components are delivered
  4. Goals
  5. Team Management
 ## Overview
-Technical Writing Project - Trello-like app backend dev with tech docs
+Technical Writing Project - Trello-like app fullstack dev with technical documentation
 
 **Current Version:** 1.0  
 
