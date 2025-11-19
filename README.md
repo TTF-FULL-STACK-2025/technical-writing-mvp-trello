@@ -12,6 +12,7 @@ Technical Writing Project - Trello-like app backend dev with tech docs
 **Current Version:** 1.0  
 **Date:** 19-11-2025  
 **Team:** Fiorio Matteo, Samuele Piazzi, Samuele Gonnella, Tommaso Villa, Cervini Alessandro, Candela Gloria, Pero Marialia, Granata Filippo, Buzzi Corinna
+
 **Approved by:** Luca Sacchi Ricciardi
 
 This repository contains the backend implementation for a Trello- styled web-based kanban application.
