@@ -9,8 +9,11 @@ Status: MVP in development — documentation updated as components are delivered
  5. Team Management
 ## Overview
 Technical Writing Project - Trello-like app backend dev with tech docs
+
 **Current Version:** 1.0  
+
 **Date:** 19-11-2025  
+
 **Team:** Fiorio Matteo, Samuele Piazzi, Samuele Gonnella, Tommaso Villa, Cervini Alessandro, Candela Gloria, Pero Marialia, Granata Filippo, Buzzi Corinna
 
 **Approved by:** Luca Sacchi Ricciardi
