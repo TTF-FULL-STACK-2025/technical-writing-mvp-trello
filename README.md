@@ -1,70 +1,96 @@
-Upgrade the following README file based on the attached files
+# 🗂️ School Project: Full-Stack Kanban Application (Trello-clone)
 
-# School Project: Backend for a Trello-like Kanban Application
 Status: MVP in development — documentation updated as components are delivered.
-\[Foto del progetto quando disponibile]
-## Table of contents:
- 1. Overview
- 2. Documentation
- 3. Project Summary
- 4. Goals
- 5. Team Management
-## Overview
-Technical Writing Project - Trello-like app fullstack dev with technical documentation
 
-**Current Version:** 1.0  
 
-**Date:** November 19, 2025  
+
+## Table of Contents
+1. Overview
+2. Documentation
+3. Project Summary (Hybrid Architecture)
+4. Goals
+5. Tech Stack
+6. Team Management
+
+---
+
+## 1. Overview 🚀
+
+Technical Writing Project - Full-stack development of a Kanban application (Trello-like) with a focus on producing technical documentation.
+
+**Current Version:** 1.2
+
+**Date:** December 3, 2025
 
 **Team:** Fiorio Matteo, Samuele Piazzi, Samuele Gonnella, Tommaso Villa, Cervini Alessandro, Candela Gloria, Pero Marialia, Granata Filippo, Buzzi Corinna
 
 **Approved by:** Luca Sacchi Ricciardi
 
-This repository contains the full-stack implementation for a scalable, secure, and performant web-based Kanban application, emulating Trello's core features.
+This repository contains the **Hybrid Full-Stack Implementation (PHP SSR + JavaScript AJAX)** for a performant and scalable Kanban platform that emulates Trello's core functionalities. The project is a school assignment focused on clear documentation, API design, and collaborative development workflows.
 
-This project is part of a school assignment focused on the production of clear and maintainable technical documentation, API design, and collaborative development workflows.  
+---
 
-## Documentation
+## 2. Documentation 📑
+
 Full project documentation is available in the `/docs` folder:
- - **Product Requirements Document (PRD)** – overall product scope and requirements
- - **Functional Analysis**: Detailed description of backend REST APIs (FR) and frontend UI flows (FFR), use cases, and business rules.
- - **Technical Analysis / Architecture**: Deep dive into the chosen technology stack, architectural principles (Decoupled, Stateless Backend, Optimistic UI), and DevOps strategy.
-Links are to be added when available.
-## Project Summary
-The application is designed as a Full-Stack System with a completely Decoupled Architecture, communicating exclusively via RESTful APIs.
-The MVP includes user accounts, boards, lists, cards, role management, and activity logging.
 
-The MVP includes the following must-have functionalities:
-- Boards, Lists, and Cards (Full CRUD and Reordering).
-- Authentication (JWT) and Authorization (Role-Based Access Control - RBAC) at the board level.
-- Board Membership management (Owner, Editor, Viewer roles).
-- Card Details: Assignments, Comments, Due Dates, and Labels.
-- Activity Logging (tracking CRUD operations).
-- Frontend UX: Intuitive Kanban board with fluid Drag & Drop for cards and lists.
+* **Product Requirements Document (PRD):** Overall product scope and requirements (**V. 1.2**).
+* **Technical Analysis / Architecture:** Details on the **PHP/MySQL** technology stack, architectural principles (**Hybrid SSR/AJAX**), security, and development plan (**V. 1.2**).
+* **Functional Analysis (To be developed):** Detailed description of use cases and business rules.
 
-For the full feature list, refer to the PRD in `/docs`.
-## Project Goals
- - Provide a scalable, secure, high-performance backend (API call **<300ms**).
-- Develop an intuitive Frontend that implements the Kanban paradigm with a smooth **Drag & Drop** experience.
-- Expose a complete **RESTful API** well-documented with OpenAPI 3.x / Swagger UI.
-## Tech Stack
- - Language: Python
- - Framework: FastAPI
- - Database: PostgreSQL expected
- - Auth: OAuth2/JWT
- - Containerization: Docker
- - API Docs: OpenAPI/Swagger (auto-generated)
-## Team Management
+---
 
-| Name                  | Role        |
-| --------------------- | ----------- |
-| Luca Sacchi Ricciardi | CEO         |
-| Matteo Fiorio         | Team Leader |
-| Tommaso Villa         | Member      |
-| Samuele Piazzi        | Member      |
-| Filippo Granata       | Member      |
-| Samuele Gonnella      | Member      |
-| Corinna Buzzi         | Member      |
-| Marialia Pero         | Member      |
-| Alessandro Cervini    | Member      |
-| Gloria Candela        | Member      |
+## 3. Project Summary (Hybrid Architecture) 🏗️
+
+The application is designed as a **Hybrid System** that utilizes **Server-Side Rendering (SSR) in PHP** for initial loading and **Vanilla JavaScript** and **AJAX** calls for all dynamic interactions, such as Drag & Drop and opening modals.
+
+The MVP (Minimum Viable Product) includes the following core functionalities:
+
+* **Boards, Lists, and Cards:** Full CRUD (Create, Read, Update, Delete) and Reordering.
+* **Card Movement:** Smooth Drag & Drop interaction with position updates via `update_card_position.php`.
+* **Authentication and Authorization (To be implemented):** Based on **PHP Sessions** and Role-Based Access Control (**RBAC**).
+* **Member Management:** `Owner`, `Editor`, and `Viewer` roles at the board level.
+* **Card Details (Expanding):** Support for assignees, comments, due dates, and labels.
+* **Activity Log (To be implemented):** Tracking of changes on Boards, Lists, and Cards.
+
+---
+
+## 4. Goals 🎯
+
+* Develop a **robust and secure** backend based on PHP/MySQL, with protection ensured by **PDO (Prepared Statements)**.
+* Ensure high performance: **Average AJAX Response Time $<300$ms**.
+* Develop an intuitive Frontend that implements the Kanban paradigm with a fluid **Drag & Drop** experience, managed entirely in **Vanilla JS**.
+* Implement a basic **Internationalization (i18n)** system.
+
+---
+
+## 5. Tech Stack 💻
+
+The architecture is based on a modified LAMP stack for dynamic interactions:
+
+| Component | Technology | Role |
+|:---|:---|:---|
+| **Backend Language** | **PHP** | Business logic, SSR rendering, and management of AJAX endpoints. |
+| **Database** | **MySQL** | Persistent data storage. |
+| **DB Driver** | **PDO** | Secure connections and SQL Injection prevention. |
+| **Frontend** | **Vanilla JavaScript** | Dynamic logic (Drag & Drop, Modals) and Fetch/AJAX calls. |
+| **Authentication** | **PHP Sessions** | Server-side state and authentication management (To be implemented). |
+| **Containerization** | **Docker** | Consistent development and production environments. |
+| **API Docs** | Manual | Documentation of AJAX endpoints (lack of auto-generation). |
+
+---
+
+## 6. Team Management 👥
+
+| Name | Role |
+|:---|:---|
+| Luca Sacchi Ricciardi | CEO |
+| **Matteo Fiorio** | **Team Leader** |
+| Tommaso Villa | Member |
+| Samuele Piazzi | Member |
+| Filippo Granata | Member |
+| Samuele Gonnella | Member |
+| Corinna Buzzi | Member |
+| Marialia Pero | Member |
+| Alessandro Cervini | Member |
+| Gloria Candela | Member |
