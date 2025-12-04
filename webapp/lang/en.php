@@ -15,7 +15,9 @@ return [
     'alert_title_empty' => 'The title cannot be empty.',
     'alert_delete_confirm' => 'Are you sure you want to delete this card?',
     'alert_title_new_empty' => 'The card title cannot be empty.',
+    'logout' => 'Logout',
     // Nuovo: Pulsanti per la selezione della lingua
     'lang_it' => 'Italian',
     'lang_en' => 'English',
+    'lang_fr' => 'French',
 ];

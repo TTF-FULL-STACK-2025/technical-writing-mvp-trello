@@ -1,10 +1,16 @@
 <?php
+// START DEBUGGING
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+// END DEBUGGING
 require 'config.php'; // Includi il file di connessione
-
+require 'auth.php'; // File di auth
 // =======================================================
 // INIZIALIZZAZIONE INTERNAZIONALIZZAZIONE (i18n) - DINAMICA
 // =======================================================
-session_start();
+check_auth();
+$user_id = $_SESSION['user_id'];
 
 // 1. SCANSIONA LA CARTELLA LANG PER OTTENERE LE LINGUE DISPONIBILI
 $lang_dir = __DIR__ . '/lang/';
@@ -43,9 +49,84 @@ if (file_exists($lang_file)) {
 // =======================================================
 
 
-// 1. Recupera tutte le liste ordinate per posizione
-$stmt_lists = $pdo->query("SELECT * FROM lists ORDER BY position ASC");
-$lists = $stmt_lists->fetchAll();
+// =======================================================
+// GESTIONE BACHECA (BOARD)
+// =======================================================
+
+// 1. Recupera TUTTE le bacheche dell'utente
+// CAMBIO CHIAVE: JOIN con board_members per recuperare solo le bacheche dove l'utente è membro.
+$stmt_boards = $pdo->prepare("
+    SELECT b.board_id, b.name 
+    FROM boards b
+    JOIN board_members bm ON b.board_id = bm.board_id
+    WHERE bm.user_id = ?
+    ORDER BY b.board_id ASC
+");
+$stmt_boards->execute([$user_id]);
+$boards = $stmt_boards->fetchAll();
+
+// 2. Determina la bacheca corrente
+$current_board_id = null;
+$current_board_name = $lang['no_boards'] ?? 'Nessuna Bacheca Trovata'; // Default
+$lists = []; // Default
+
+if (!empty($boards)) {
+    // --- INIZIO GESTIONE BORAD ID SICURA ---
+    $first_board_id = $boards[0]['board_id'];
+    $valid_board_ids = array_column($boards, 'board_id');
+    
+    // Logica di selezione: 1. GET, 2. SESSION, 3. Primo ID
+    $potential_id = null;
+    if (isset($_GET['board_id']) && is_numeric($_GET['board_id'])) {
+        $potential_id = (int)$_GET['board_id'];
+    } elseif (isset($_SESSION['current_board_id'])) {
+        $potential_id = (int)$_SESSION['current_board_id'];
+    } else {
+        $potential_id = $first_board_id;
+    }
+
+    // Verifica se l'ID potenziale è valido per l'utente, altrimenti usa il primo
+    if (in_array($potential_id, $valid_board_ids)) {
+        $current_board_id = $potential_id;
+    } else {
+        $current_board_id = $first_board_id;
+    }
+    
+    $_SESSION['current_board_id'] = $current_board_id; // Imposta o aggiorna la sessione
+    // --- FINE GESTIONE BORAD ID SICURA ---
+
+
+    // 3. Recupera tutte le liste ORA filtrate per board_id
+    $stmt_lists = $pdo->prepare("SELECT * FROM lists WHERE board_id = ? ORDER BY position ASC");
+    $stmt_lists->execute([$current_board_id]);
+    $lists = $stmt_lists->fetchAll();
+    
+    // Trova il nome della bacheca corrente per il titolo
+    foreach($boards as $board) {
+        if ($board['board_id'] == $current_board_id) {
+            $current_board_name = $board['name'];
+            break;
+        }
+    }
+}
+
+
+// =======================================================
+// RECUPERO RUOLO PER IL FRONTEND
+// =======================================================
+
+$current_user_role = null; 
+
+if ($current_board_id) {
+    // La connessione $pdo e $user_id sono già disponibili qui.
+    // Dobbiamo usare la funzione di `permissions.php`
+    require_once 'permissions.php'; // Assicurati che permissions.php sia incluso
+    $current_user_role = get_user_role_on_board($pdo, $user_id, $current_board_id);
+}
+
+// Mappatura dei permessi per il frontend (più semplice):
+$can_edit = ($current_user_role == 'owner' || $current_user_role == 'editor');
+$can_view = ($current_user_role != null); // Se l'utente è un membro (owner, editor o viewer)
 ?>
 
 <!DOCTYPE html>
@@ -326,6 +407,9 @@ h1 {
     top: 20px;
     right: 30px;
     z-index: 10; /* Assicura che sia sopra gli altri elementi */
+    /* AGGIUNTA CHIAVE: Usa flexbox per allineare lingua e logout */
+    display: flex;
+    gap: 10px; /* Spazio tra i due pulsanti */
 }
 
 .dropdown-toggle {
@@ -338,6 +422,7 @@ h1 {
     font-weight: 600;
     display: flex;
     align-items: center;
+    height: 50px;
 }
 .dropdown-toggle:hover {
     background-color: #2563eb;
@@ -379,6 +464,61 @@ h1 {
     color: #3b82f6;
     font-weight: 600;
 }
+
+.logout-button {
+    background-color: #ef4444; /* Rosso */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none; /* Rimuove la sottolineatura */
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+    background-color: #dc2626; /* Rosso più scuro all'hover */
+}
+
+/* Contenitore per il solo pulsante lingua e il suo menu, necessario per posizionare il sottomenu */
+.lang-toggle-container {
+    position: relative; /* Base per il posizionamento assoluto del .dropdown-menu */
+}
+
+/* Inserisci questo CSS nel blocco <style> in index.php */
+
+/* Stile per il selettore della bacheca */
+.boards-selector-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.boards-selector-container h2 {
+    margin-right: 20px;
+    font-size: 20px;
+    color: #1c1f26;
+    font-weight: 700;
+}
+
+.boards-selector-container select {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #a8b0bd;
+    font-size: 14px;
+    background-color: #ffffff;
+    cursor: pointer;
+}
+
+/* Stile per gli elementi disabilitati visualmente */
+.disabled-action {
+    opacity: 0.5 !important;
+    pointer-events: none; /* Disabilita i clic */
+    cursor: default !important;
+}
     </style>
 </head>
 <body>
@@ -405,23 +545,63 @@ h1 {
 </div>
     
 <div class="language-dropdown" id="lang-dropdown">
-    <button class="dropdown-toggle" id="dropdown-toggle-button">
-        🌐 <?php echo strtoupper($current_lang); ?>
-    </button>
-    <div class="dropdown-menu" id="dropdown-menu">
-        <?php foreach ($available_langs as $code): ?>
-            <?php
-                // Cerchiamo la traduzione del nome della lingua, altrimenti usiamo il codice
-                $lang_name_key = 'lang_' . $code;
-                // NOTA: $lang è disponibile qui perché è stata caricata prima nell'inizializzazione PHP
-                $display_name = isset($lang[$lang_name_key]) ? $lang[$lang_name_key] : strtoupper($code);
-            ?>
-            <a href="?lang=<?php echo $code; ?>" class="<?php echo ($current_lang == $code ? 'active' : ''); ?>">
-                <?php echo htmlspecialchars($display_name); ?>
-            </a>
-        <?php endforeach; ?>
+
+    <div class="lang-toggle-container">
+        <button class="dropdown-toggle" id="dropdown-toggle-button">
+            🌐 <?php echo strtoupper($current_lang); ?>
+        </button>
+        <div class="dropdown-menu" id="dropdown-menu">
+            <?php foreach ($available_langs as $code): ?>
+                <?php
+                    // Cerchiamo la traduzione del nome della lingua, altrimenti usiamo il codice
+                    $lang_name_key = 'lang_' . $code;
+                    // NOTA: $lang è disponibile qui perché è stata caricata prima nell'inizializzazione PHP
+                    $display_name = isset($lang[$lang_name_key]) ? $lang[$lang_name_key] : strtoupper($code);
+                ?>
+                <a href="?lang=<?php echo $code; ?>" class="<?php echo ($current_lang == $code ? 'active' : ''); ?>">
+                    <?php echo htmlspecialchars($display_name); ?>
+                </a>
+            <?php endforeach; ?>
+        </div>
     </div>
+
+    
+    <a href="auth.php?logout=1" class="logout-button">
+    🚪 <?php echo $lang['logout'] ?? 'Esci'; ?>
+    </a>
 </div>
+
+<div class="boards-selector-container">
+    <h2><?php echo htmlspecialchars($current_board_name); ?></h2>
+    
+    <select onchange="window.location.href = 'index.php?board_id=' + this.value">
+        <?php if (empty($boards)): ?>
+             <option disabled selected><?php echo $lang['no_boards'] ?? 'Nessuna Bacheca Trovata'; ?></option>
+        <?php endif; ?>
+        <?php foreach ($boards as $board): ?>
+            <option 
+                value="<?php echo $board['board_id']; ?>"
+                <?php echo ($board['board_id'] == $current_board_id) ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($board['name']); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+    
+    <button onclick="showNewBoardForm()" style="margin-left: 10px; background-color: #3b82f6; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+        + <?php echo $lang['new_board_btn'] ?? 'Nuova Bacheca'; ?>
+    </button>
+</div>
+
+<div id="new-board-form-container" class="hidden" style="margin-top: 20px; padding: 15px; border: 1px solid #ccc; background: #fff; max-width: 400px; border-radius: 8px; margin-bottom: 25px;">
+    <h3><?php echo $lang['create_new_board'] ?? 'Crea Nuova Bacheca'; ?></h3>
+    <input type="text" id="new-board-name" placeholder="<?php echo $lang['board_name_placeholder'] ?? 'Nome della Bacheca...'; ?>" style="width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; border: 1px solid #a8b0bd; border-radius: 4px;">
+    <button onclick="saveNewBoard()" class="save-card-button" style="margin-top: 0; background-color: #10b981;"><?php echo $lang['create'] ?? 'Crea'; ?></button>
+    <button onclick="hideNewBoardForm()" class="cancel-card-button" style="margin-top: 0;"><?php echo $lang['cancel'] ?? 'Annulla'; ?></button>
+</div>
+
+
+
+
     <h1>📋 <?php echo $lang['board_title']; ?></h1>
 
     <div class="board">
@@ -450,9 +630,10 @@ h1 {
                 </div>
 
                 <div class="add-card-container">
-                    <button class="add-card-button" data-list-id="<?php echo $list['list_id']; ?>">
-                        <?php echo $lang['add_card']; ?>
-                    </button>
+                    
+                <button class="add-card-button <?php echo $can_edit ? '' : 'disabled-action'; ?>" data-list-id="<?php echo $list['list_id']; ?>">
+                    <?php echo $lang['add_card']; ?>
+                </button>
                     
                     <div class="add-card-form hidden">
     <textarea class="card-title-input" placeholder="<?php echo $lang['card_title_placeholder']; ?>" rows="1"></textarea>
@@ -472,7 +653,8 @@ h1 {
     const TRANSLATIONS = {
         alert_title_empty: "<?php echo str_replace('"', '\"', $lang['alert_title_empty']); ?>",
         alert_delete_confirm: "<?php echo str_replace('"', '\"', $lang['alert_delete_confirm']); ?>",
-        alert_title_new_empty: "<?php echo str_replace('"', '\"', $lang['alert_title_new_empty']); ?>"
+        alert_title_new_empty: "<?php echo str_replace('"', '\"', $lang['alert_title_new_empty']); ?>"// NUOVO: Passa i permessi al frontend
+        CAN_EDIT: <?php echo $can_edit ? 'true' : 'false'; ?>
     };
 </script>
 
@@ -525,6 +707,24 @@ h1 {
             
             // Listener per salvare i dettagli della card
             document.getElementById('save-card-details-button').addEventListener('click', saveCardDetails); 
+        
+        // NUOVO: Nascondi/disabilita azioni se l'utente è solo Viewer
+            if (!TRANSLATIONS.CAN_EDIT) {
+                // Nasconde i pulsanti di modifica e cancellazione nel modale
+                document.getElementById('save-card-details-button').classList.add('hidden');
+                document.getElementById('delete-card-button').classList.add('hidden');
+                document.getElementById('save-card-details-button').classList.add('hidden');
+
+                // Disabilita anche gli input field per evitare modifiche accidentali
+                document.getElementById('modal-card-title-input').setAttribute('disabled', 'true');
+                document.getElementById('modal-card-description-input').setAttribute('disabled', 'true');
+            } else {
+                 // ABILITA i listener solo se l'utente può editare
+                 document.getElementById('delete-card-button').addEventListener('click', deleteCardHandler);
+                 document.getElementById('save-card-details-button').addEventListener('click', saveCardDetails); 
+            }
+        
+        
         }
 
         // 5. Listener per il Dropdown Lingua
@@ -864,6 +1064,57 @@ h1 {
             console.error('Errore di rete:', error);
         });
     }
+
+
+    // =======================================================
+// V. FUNZIONI: GESTIONE BACHECHE (BOARDS)
+// =======================================================
+
+function showNewBoardForm() {
+    document.getElementById('new-board-form-container').classList.remove('hidden');
+}
+
+function hideNewBoardForm() {
+    document.getElementById('new-board-form-container').classList.add('hidden');
+    document.getElementById('new-board-name').value = ''; 
+}
+
+function saveNewBoard() {
+    const boardName = document.getElementById('new-board-name').value.trim();
+
+    if (boardName === "") {
+        alert("<?php echo $lang['board_name_placeholder'] ?? 'Inserisci un nome per la bacheca.'; ?>"); 
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('name', boardName);
+
+    // Chiamata AJAX al file add_board.php
+    fetch('add_board.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            // Se la risposta non è OK, lancia un errore per catturarlo nel catch
+            return response.json().then(error => { throw new Error(error.message); });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Ricarica la pagina per visualizzare la nuova bacheca selezionata
+            window.location.href = 'index.php?board_id=' + data.board_id;
+        } else {
+            alert('Errore durante la creazione della bacheca: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Errore di rete/server:', error);
+        alert('Impossibile salvare la nuova bacheca: ' + error.message);
+    });
+}
 </script>
 
 </body> 
