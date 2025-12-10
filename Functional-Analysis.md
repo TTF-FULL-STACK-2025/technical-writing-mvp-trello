@@ -61,20 +61,21 @@ The platform is a full-stack web application with a hybrid approach:
 
 ## 🧠 3. Detailed Functional Requirements (Requisiti funzionali dettagliati)
 
-| ID | Nome funzione | Descrizione | Input | Output | Priorità (MoSCoW) | Dipendenze |
-|:---|:---|:---|:---|:---|:---|:---|
-| **FR1.1** | User Registration | Allows sign-up with email and hashed password. | Email, Password | User created, Session started | Must | PHP/MySQL |
-| **FR1.2** | Login/Logout | Session management and credential authentication. | Email, Password | Session ID / Redirect | Must | PHP Sessions |
-| **FR1.3** | Board CRUD | Creation, Modification, Deletion of a Board. | Name, Description | Board ID | Must | FA-AUTH (Roles) |
-| **FR1.4** | List CRUD and Reorder | Creation, Modification, Deletion, and Reordering of Lists. | Board ID, List Name | Status 200 | Must | `/v1/lists` (To be defined) |
-| **FR1.5** | Card CRUD (Basic) | Creation, Title/Description Modification, Card Deletion. | List ID, Card Details | Card ID / Status 200 | Must | `/add_card.php`, `/update_card_details.php` |
-| **FR1.6** | Card Movement | Moving a Card between Lists or Reordering. | Card ID, New List ID, New Position | Status 200 | Must | `/update_card_position.php`, Vanilla JS D\&D |
-| **FR1.7** | Card Comments | Adding and deleting comments on a Card. | Card ID, User ID, Text | Comment ID | Should | New Comments endpoints |
-| **FR1.8** | Member/Role Management | Adding/removing members and managing roles (`Owner`, `Editor`, `Viewer`). | Board ID, User ID, Role | Status 200 | Must | RBAC Implementation |
-| **FR1.9** | Activity Log | Tracking of all CRUD actions on Boards, Lists, and Cards. | Action Data (User, Target, Event) | Record in DB log | Must | All CRUD APIs |
-| **FR1.11** | Multilingual (i18n) | Support for multiple languages in the interface. | Selected Language | Translated Interface | Must | Vanilla JS, PHP Load |
-| **FR2.3** | UI: Drag & Drop | Fluid interaction for moving Cards. | Mouse/touch drag | DOM Update, API Call | Must | FR1.6 |
-| **FR2.4** | UI: Card Details Modal | Modal to view and modify Card details. | Click on Card | Modal UI | Must | `/get_card_details.php` |
+The model supports the hierarchy: `Board` $\rightarrow$ `List` $\rightarrow$ `Card`.
+
+### 3.1 CRUD Operations (Existing Implementation)
+
+| Entity | PHP Endpoint | Technical Notes |
+|:---|:---|:---|
+| **Board** | `add_board.php` | Root entity |
+| **List** | `index.php` | Completed |
+| **Card** | `add_card.php` / `delete_card.php` / `update_card_details.php` / `get_card_details.php` | Complete CRUD for title and description implemented. |
+| **Card Move** | `update_card_position.php` | Handles the modification of `list_id` and `position` in a single operation. |
+
+### 3.2 Consistency Requirements
+
+  * **Positioning:** Cards use a `position` field (integer/float) for ordering. The `update_card_position.php` endpoint manages saving the new position and list.
+  * **Soft Delete:** Archiving is not implemented. The `delete_card.php` endpoint performs a **physical deletion** (`DELETE FROM cards`).
 
 -----
 

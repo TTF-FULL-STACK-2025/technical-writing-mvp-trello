@@ -52,14 +52,14 @@ This document describes the requirements for the development of a scalable, secu
 
 | ID | Name | Description | Priority (MoSCoW) | Notes |
 |:---|:---|:---|:---|:---|
-| **FR1.1** | User Registration | The user must be able to register with email and password. | Must | To be developed (Not present in the current stack) |
-| **FR1.2** | Login/Logout | Session management and authentication using credentials. | Must | To be developed (Not present in the current stack) |
-| **FR1.3** | Board Management | Complete CRUD for Boards (Creation, Modification, Deletion). | Must | Developed Completaly |
+| **FR1.1** | User Registration | The user must be able to register with email and password. (`login_register_form`) | Must | Completed |
+| **FR1.2** | Login/Logout | Session management and authentication using credentials. | Must | Completed |
+| **FR1.3** | Board Management | Complete CRUD for Boards (Creation, Modification, Archiving/Deletion). | Must | partially completed |
 | **FR1.4** | List Management | CRUD and reordering of Lists within a Board. | Must | To be developed |
 | **FR1.5** | Card Management | CRUD and modification of **title and description** (`add_card.php`, `update_card_details.php`, `delete_card.php`, `get_card_details.php`). | Must | Support for assignees, due date, and labels is to be developed. |
 | **FR1.6** | Card Movement | Ability to reorder Cards and move them between different Lists (`update_card_position.php`). | Must | Functionality supported by the Backend and implemented via Drag & Drop in the Frontend (`index.php`). |
 | **FR1.7** | Comments | Addition and deletion of comments on Cards. | Should | To be developed (Not present in the current stack) |
-| **FR1.8** | Board Members | Adding, removing, and managing roles (`Owner`, `Editor`, `Viewer`). | Must | Developed |
+| **FR1.8** | Board Members | Adding, removing, and managing roles (`Owner`, `Editor`, `Viewer`). | Must | partially completed, graphics management is missing |
 | **FR1.9** | Activity Log | Tracking of changes (CRUD) on Boards, Lists, and Cards. | Must | To be developed (Not present in the current stack) |
 | **FR1.10** | Basic Notifications | Notifications for card assignment. | Should | To be developed (Not present in the current stack) |
 | **FR1.11** | Multilingual (i18n) | The frontend must support multiple languages. | Must | Initial i18n handling present in the `index.php` file. |

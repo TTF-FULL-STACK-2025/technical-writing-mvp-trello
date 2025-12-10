@@ -32,11 +32,9 @@ This repository contains the **Hybrid Full-Stack Implementation (PHP SSR + JavaS
 
 ## 2. Documentation 📑
 
-Full project documentation is available in the `/docs` folder:
-
 * **Product Requirements Document (PRD):** Overall product scope and requirements (**V. 1.2**).
 * **Technical Analysis / Architecture:** Details on the **PHP/MySQL** technology stack, architectural principles (**Hybrid SSR/AJAX**), security, and development plan (**V. 1.2**).
-* **Functional Analysis (To be developed):** Detailed description of use cases and business rules.
+* **Functional Analysis:** Detailed description of use cases and business rules.
 
 ---
 
@@ -49,8 +47,8 @@ The MVP (Minimum Viable Product) includes the following core functionalities:
 * **Boards, Lists, and Cards:** Full CRUD (Create, Read, Update, Delete) and Reordering.
 * **Card Movement:** Smooth Drag & Drop interaction with position updates via `update_card_position.php`.
 * **Authentication and Authorization (To be implemented):** Based on **PHP Sessions** and Role-Based Access Control (**RBAC**).
-* **Member Management:** `Owner`, `Editor`, and `Viewer` roles at the board level.
-* **Card Details (Expanding):** Support for assignees, comments, due dates, and labels.
+* **Member Management (To be implemented):** `Owner`, `Editor`, and `Viewer` roles at the board level.
+* **Card Details (Expanding - To be implemented):** Support for assignees, comments, due dates, and labels.
 * **Activity Log (To be implemented):** Tracking of changes on Boards, Lists, and Cards.
 
 ---
