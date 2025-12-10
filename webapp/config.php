@@ -3,7 +3,7 @@
 $host = 'localhost'; // Se usi XAMPP/WAMP, 'localhost' è l'impostazione predefinita
 $db   = 'trello_clone'; // Il nome del database che hai creato
 $user = 'root';      // Utente di default per XAMPP/WAMP
-$pass = 'IY6L43dX';          // Password di default vuota per XAMPP/WAMP (CAMBIALA IN PRODUZIONE!)
+$pass = 'password';          // Password di default vuota per XAMPP/WAMP (CAMBIALA IN PRODUZIONE!)
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
