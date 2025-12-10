@@ -68,8 +68,8 @@ The model supports the hierarchy: `Board` $\rightarrow$ `List` $\rightarrow$ `Ca
 
 | Entity | PHP Endpoint | Technical Notes |
 |:---|:---|:---|
-| **Board** | N/A | Root entity (To be developed). |
-| **List** | N/A | Container entity (To be developed, but data is preloaded by `index.php`). |
+| **Board** | `add_board.php` / `add_member.php` / `get_board_members.php` / `remove_member.php` / `update_member_role.php` | Manage Board and Permission Board |
+| **List** | `index.php` | Lists of Board in main file php |
 | **Card** | `add_card.php` / `delete_card.php` / `update_card_details.php` / `get_card_details.php` | Complete CRUD for title and description implemented. |
 | **Card Move** | `update_card_position.php` | Handles the modification of `list_id` and `position` in a single operation. |
 

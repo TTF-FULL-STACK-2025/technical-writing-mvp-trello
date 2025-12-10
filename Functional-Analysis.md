@@ -1,4 +1,4 @@
-# 💻 Technical Analysis: Full-Stack Project Management Platform (Trello-clone)
+# 💻 Functional Analysis: Full-Stack Project Management Platform (Trello-clone)
 
 **Project Title:** Project Management Platform (Trello-clone) <br>
 **Version:** 1.2 (Alignment with PHP/MySQL Stack) <br>
@@ -8,170 +8,212 @@
 
 -----
 
-## 1\. ⚙️ Architecture and Technology Stack (Revised)
+## 🧭 1. Introduction
 
-The application is designed as a **hybrid system (SSR PHP + AJAX Vanilla)**, utilizing PHP for the initial rendering and Vanilla JavaScript for dynamic interactions (Drag & Drop, Modals).
+### 1.1 Document Purpose
 
-### 1.1 Effective Technology Stack
+This document defines the detailed functional analysis for the development of the Full-Stack Project Management Platform, specifying the expected behavior of the hybrid system (SSR PHP + AJAX Vanilla JS) in response to the PRD requirements.
 
-#### Backend (Server-Side Logic/API)
+### 1.2 Context
 
-  * **Language/Runtime:** **PHP** (used for all Card CRUD operations).
-  * **Database (DB):** **MySQL** (assumed via `config.php`).
-  * **DB Connection:** **PDO** (used for secure queries).
-  * **Authentication:** **PHP Sessions** (To be implemented).
-  * **Containerization:** Docker (maintained for the environment).
-  * **Documentation:** Manual (Lack of standards like OpenAPI).
+The project aims to create a Kanban-based project management platform, implemented on an existing **PHP/MySQL** stack.
 
-#### Frontend (Client)
+  * **Request Origin:** Development of a complete and scalable product for team task management.
+  * **References:** PRD v1.2 – Alignment with PHP/MySQL Stack, Section 3 (Functional Requirements) and Section 5 (Technical Architecture).
 
-  * **Framework:** **Vanilla JavaScript** and **Server-Side Rendering (SSR) PHP**.
-  * **State Management:** **Global JavaScript variables and classes** (procedural approach).
-  * **Styling:** Custom CSS (present in `index.php`).
-  * **Drag & Drop Engine:** **D\&D logic implemented in Vanilla JS** (present in `index.php`).
+### 1.3 Main Objectives
 
-### 1.2 Architectural Principles
-
-  * **Hybrid SSR/AJAX:** Initial loading and list rendering are handled by PHP. Dynamic modifications (Card creation, editing, movement) occur via **AJAX/Fetch API** calls to the PHP endpoints.
-  * **Stateful Backend:** Authentication will rely on server-side sessions, making the backend stateful (To be implemented).
-  * **Immediate UI Update (Vanilla JS):** The user interface is updated immediately following a successful AJAX call.
+  * Implement a robust **Authentication (PHP Sessions) and Authorization (RBAC)** system at the Board level (FR1.1, FR1.2, FR1.8).
+  * Ensure **complete CRUD functionalities** for Board and List (FR1.3, FR1.4).
+  * Guarantee smooth and responsive **Drag & Drop** for Card movement, with persistence via AJAX (FR1.6, FR2.3).
+  * Develop an **Activity Log** to track critical changes (FR1.9).
 
 -----
 
-## 2\. 🔐 Security and Authorization (RBAC) (To Be Implemented)
+## 🧩 2. General System Description
 
-Security will be based on session authentication and a role-based authorization system applied at the board level.
+### 2.1 Application Context
 
-### 2.1 Authentication (PHP Sessions)
+The platform is a full-stack web application with a hybrid approach:
 
-  * **Flow:** The user logs in. The server creates a **PHP session** and stores its ID in a cookie. The session is used to authenticate AJAX requests.
-  * **Password Protection:** Passwords must be stored using **strong hashing** (e.g., `password_hash()` with **Bcrypt**).
-  * **SQL Injection:** Protection is ensured by using **Prepared Statements (PDO)** in all existing endpoints (`add_card.php`, `delete_card.php`, etc.).
+  * **SSR (Server-Side Rendering) PHP:** Used for the initial page load and static rendering (e.g., `index.php`).
+  * **AJAX (Vanilla JavaScript):** Used for all dynamic interactions (e.g., Card creation, detail updates, Drag & Drop).
+  * **Interfaces with other modules:** The application is standalone but interfaces with the **MySQL Database** via PDO and the **PHP Session System** for authentication.
 
-### 2.2 Authorization (Role-Based Access Control - RBAC)
+### 2.2 Involved Actors
 
-Permissions must be applied at the Board level, checking the session user ID against the assigned roles. (Currently not implemented).
-
-| Role | Permissions | Example Functions |
+| Attore | Descrizione | Permessi / Ruolo |
 |:---|:---|:---|
-| **Owner** | Full control over the board, members, and content. | Board Deletion, Member Management |
-| **Editor** | Creation and modification of content. | List/Card Creation, Drag & Drop operations (Supported by existing files) |
-| **Viewer** | Read-only access to board content. | Board Viewing |
+| Unregistered User | Person attempting to access the system | Registration (FR1.1), Login (FR1.2) |
+| Logged-in User | Person authenticated in the system | Access to Dashboard (FR2.1) |
+| Owner (Board) | Creator or main manager of the Board | Complete control over Board, members, roles, content. |
+| Editor (Board) | Active member of the Board | CRUD on Lists/Cards, Card Movement (FR1.4, FR1.5, FR1.6). |
+| Viewer (Board) | Member with read-only access | Viewing Board and Cards (FR2.2). |
+
+### 2.3 General Logical Flow (Flusso logico generale)
+
+1.  **Access:** User (New/Existing) $\rightarrow$ **Registration/Login** $\rightarrow$ Session created.
+2.  **Dashboard:** User $\rightarrow$ **View accessible Boards** (FR2.1).
+3.  **Task Management:** User (Editor) $\rightarrow$ View Board (FR2.2) $\rightarrow$ **Create/Modify/Move Card** (FR1.5, FR1.6, FR2.3).
+4.  **Backend:** Each dynamic action (e.g., movement) $\rightarrow$ **AJAX POST** to PHP Endpoint (`update_card_position.php`) $\rightarrow$ Backend **Authorization (RBAC)** $\rightarrow$ **MySQL DB** (update) $\rightarrow$ Write **Activity Log** (FR1.9) $\rightarrow$ Response Status 200.
 
 -----
 
-## 3\. 💾 Data Model and Core Functionalities (Backend)
+## 🧠 3. Detailed Functional Requirements (Requisiti funzionali dettagliati)
 
-The model supports the hierarchy: `Board` $\rightarrow$ `List` $\rightarrow$ `Card`.
-
-### 3.1 CRUD Operations (Existing Implementation)
-
-| Entity | PHP Endpoint | Technical Notes |
-|:---|:---|:---|
-| **Board** | N/A | Root entity (To be developed). |
-| **List** | N/A | Container entity (To be developed, but data is preloaded by `index.php`). |
-| **Card** | `add_card.php` / `delete_card.php` / `update_card_details.php` / `get_card_details.php` | Complete CRUD for title and description implemented. |
-| **Card Move** | `update_card_position.php` | Handles the modification of `list_id` and `position` in a single operation. |
-
-### 3.2 Consistency Requirements
-
-  * **Positioning:** Cards use a `position` field (integer/float) for ordering. The `update_card_position.php` endpoint manages saving the new position and list.
-  * **Soft Delete:** Archiving is not implemented. The `delete_card.php` endpoint performs a **physical deletion** (`DELETE FROM cards`).
-
------
-
-## 4\. 🖥️ Frontend Architecture & User Experience
-
-The interface is based on a monolithic structure rendered by PHP, with interaction logic handled by Vanilla JavaScript.
-
-### 4.1 Component Structure
-
-The structure is defined directly within the `index.php` file.
-
-  * **Layout:** Styling is defined in the `<style>` tag in `index.php`.
-  * **Kanban Board:** Horizontal scrollable container.
-  * **Card Modal:** Managed by `openCardModal` and `closeCardModal` in JavaScript.
-
-### 4.2 Drag and Drop Logic (Core Interaction)
-
-The DnD logic is implemented entirely in Vanilla JavaScript.
-
-  * **Core Functions:** `handleDragStart`, `handleDragOver`, `handleDrop`, `getDragAfterElement` (`index.php`).
-  * **Logic:**
-    1.  **OnDragStart:** Stores the card ID in a global variable (`draggedCardId`).
-    2.  **OnDragOver:** Calculates the insertion point (`getDragAfterElement`) and moves the element in the DOM in real-time.
-    3.  **OnDrop:**
-          * **DOM Update:** The card has already been moved in the DOM.
-          * **API Call:** Sends a `POST` to `update_card_position.php` with `cardId`, `newListId`, and `newPosition`.
-
-### 4.3 State Management
-
-  * **Server State:** No centralized state manager. Data is reloaded or modified locally in the DOM after each AJAX operation.
-  * **UI State:** Direct management of the DOM and CSS classes (`.hidden`, `.dragging`, `.drag-over`). Translations are loaded into a global JS variable (`TRANSLATIONS`).
+| ID | Nome funzione | Descrizione | Input | Output | Priorità (MoSCoW) | Dipendenze |
+|:---|:---|:---|:---|:---|:---|:---|
+| **FR1.1** | User Registration | Allows sign-up with email and hashed password. | Email, Password | User created, Session started | Must | PHP/MySQL |
+| **FR1.2** | Login/Logout | Session management and credential authentication. | Email, Password | Session ID / Redirect | Must | PHP Sessions |
+| **FR1.3** | Board CRUD | Creation, Modification, Deletion of a Board. | Name, Description | Board ID | Must | FA-AUTH (Roles) |
+| **FR1.4** | List CRUD and Reorder | Creation, Modification, Deletion, and Reordering of Lists. | Board ID, List Name | Status 200 | Must | `/v1/lists` (To be defined) |
+| **FR1.5** | Card CRUD (Basic) | Creation, Title/Description Modification, Card Deletion. | List ID, Card Details | Card ID / Status 200 | Must | `/add_card.php`, `/update_card_details.php` |
+| **FR1.6** | Card Movement | Moving a Card between Lists or Reordering. | Card ID, New List ID, New Position | Status 200 | Must | `/update_card_position.php`, Vanilla JS D\&D |
+| **FR1.7** | Card Comments | Adding and deleting comments on a Card. | Card ID, User ID, Text | Comment ID | Should | New Comments endpoints |
+| **FR1.8** | Member/Role Management | Adding/removing members and managing roles (`Owner`, `Editor`, `Viewer`). | Board ID, User ID, Role | Status 200 | Must | RBAC Implementation |
+| **FR1.9** | Activity Log | Tracking of all CRUD actions on Boards, Lists, and Cards. | Action Data (User, Target, Event) | Record in DB log | Must | All CRUD APIs |
+| **FR1.11** | Multilingual (i18n) | Support for multiple languages in the interface. | Selected Language | Translated Interface | Must | Vanilla JS, PHP Load |
+| **FR2.3** | UI: Drag & Drop | Fluid interaction for moving Cards. | Mouse/touch drag | DOM Update, API Call | Must | FR1.6 |
+| **FR2.4** | UI: Card Details Modal | Modal to view and modify Card details. | Click on Card | Modal UI | Must | `/get_card_details.php` |
 
 -----
 
-## 5\. 🚀 Performance, Logistics, and DevOps
+## ⚙️ 4. Non-Functional Requirements (Requisiti non funzionali)
 
-### 5.1 Performance (NFR)
-
-  * **API Latency:** Average $<300$ms.
-  * **Frontend:** Being SSR/Vanilla, the First Contentful Paint is generally fast, but re-rendering operations and managing very long lists (50+ Cards) might be inefficient without Virtualization.
-  * **Database:** Queries must be optimized (index on `position` and `list_id`).
-
-### 5.2 DevOps
-
-  * **CI/CD:** Continued use of Docker for the development/deployment environment. Lack of automated tests (To be developed).
-  * **Monitoring:** Necessary to implement a centralized logging system for PHP and JavaScript errors (e.g., sending JS errors to the server).
-
------
-
-## 6\. 🛠️ API Specifications (AJAX Endpoints)
-
-  * **Base URL:** Direct PHP endpoints (e.g., `/add_card.php`).
-  * **Transfer Method:** Data is transferred via **`FormData`** (e.g., `new FormData()` in JavaScript) as **POST** requests.
-  * **CORS:** Not required as the frontend and backend share the same domain.
-  * **Error Handling:** Errors are handled via HTTP status codes and JSON messages returned by the PHP scripts.
-
------
-
-## 7\. ✅ Metrics and Success Criteria
-
-### 7.1 Key KPIs
-
-  * **Card Creation Success Rate:** Success rate for Card creation $\rightarrow$ 100% (zero critical errors).
-  * **Average AJAX Response Time:** $<300$ms.
-  * **First Contentful Paint (FCP):** Frontend loads in **$<1.5$s**.
-  * **Interaction to Next Paint (INP):** Drag and drop interactions must feel responsive ($<200$ms).
-
------
-
-## 8\. 📅 Planning and Deliverables
-
-The plan is adapted to include the development of authentication features in the existing PHP stack.
-
-| Phase | Backend Activity | Frontend Activity | Main Deliverables |
+| Tipo | Descrizione | Valore / Target | Note |
 |:---|:---|:---|:---|
-| **Phase 1** (2 Weeks) | Architecture Setup, **Authentication (PHP Sessions, User DB Setup)** | Project Init, UI Kit Setup, Login/Register Pages (UI) | Functional Auth Flow (E2E), Repository Setup |
-| **Phase 2** (3 Weeks) | Board/List CRUD, RBAC Middleware | Dashboard Layout, Board Creation, Board View (UI) | Board Management, Role Handling UI |
-| **Phase 3** (3 Weeks) | Card CRUD, Move Logic, Comments | **Drag & Drop Implementation** (Reliability), Card Modals | **Functional Kanban Board** |
-| **Phase 4** (2 Weeks) | Activity Log, Notifications, Metadata | Activity Sidebar, Notifications UI, Attachment UX | Complete User Experience |
-| **Phase 5** (1 Week) | Security Hardening, API Freeze | Performance Tuning, Bundle Optimization, E2E Tests | Production Deployment |
+| **Performance (BE)** | Latency of AJAX calls for dynamic interactions. | $<300$ms (AART) | Essential for responsive D\&D. |
+| **Security (BE)** | Protection against SQL Injection and XSS attacks. | Use of PDO Prepared Statements. Bcrypt hashing for passwords. | Implementation of strict RBAC and Rate Limiting. |
+| **Usability (FE)** | Speed of initial setup completion. | 90% of users complete Registration + Board + Card in $<60$ seconds. | Measures user flow effectiveness. |
+| **Performance (FE)** | Interface loading speed. | First Contentful Paint (FCP) $<1.5$s. | Favored by the SSR/Vanilla JS approach. |
+| **Documentation (BE)**| No OpenAPI, need for manual documentation. | Clear documentation for all endpoints in Section 5.2. | Risk: dependence on internal knowledge (Risk 8.1). |
 
 -----
 
-## 9\. ⚠️ Risks and Mitigation
+## 🧾 5. Detailed Flows (Use Case / Diagrams) (Flussi dettagliati)
 
-| Type | Description | Mitigation |
+### 5.1 Use Case 1 – Card Movement (Drag & Drop)
+
+**Actors:** Editor User (Authenticated)
+**Description:** A user moves a Card from one List to another and updates the DB.
+
+**Main Flow (Flusso principale):**
+
+1.  The user views the Board (`index.php`).
+2.  The user starts the **Drag** of the Card (Vanilla JS: `handleDragStart`).
+3.  The user drops the Card onto a new List/position (Vanilla JS: `handleDrop`).
+4.  **FE Call:** JavaScript sends an **AJAX POST** request to `/update_card_position.php`.
+5.  **BE Process (BE Processo):**
+      * Verification of Authentication (PHP Session).
+      * Verification of Authorization (RBAC): The user has the `Editor` or `Owner` role on the Board.
+      * Executes DB Update: `UPDATE cards SET list_id = :newListId, position = :newPosition WHERE card_id = :cardId`.
+      * Records the action in the Activity Log (FR1.9).
+6.  **Response (Risposta):** The Backend returns **Status 200**.
+7.  **FE Update:** No DOM update necessary, the element has already been moved client-side.
+
+**Alternative Flow (Authorization Error) (Flusso alternativo - Errore di Autorizzazione):**
+
+  * If the user is a `Viewer` or is not a member $\rightarrow$ BE returns **Status 403 Forbidden**. The Card is not moved in the DB, and the FE should revert the Card to its previous position (Undo DOM move).
+
+**Related Requirements (Requisiti collegati):** FR1.6, FR2.3, FR1.8, FR1.9, Performance (BE).
+
+### 5.2 Use Case 2 – Access and Authorization (RBAC Implementation)
+
+**Actors:** Logged-in User
+**Description:** After Login, the user attempts to perform an action that requires a certain Role.
+
+**Main Flow (Flusso principale):**
+
+1.  The user Logs in (FR1.2), obtaining a PHP Session.
+2.  The user attempts a protected action (e.g., `/delete_card.php`).
+3.  **BE Middleware:** The PHP script intercepts the request.
+4.  Checks the PHP Session for the User ID.
+5.  DB Query: `SELECT role FROM board_members WHERE user_id = :userId AND board_id = :boardId`.
+6.  **Verification (Verifica):** If the `role` is `Owner` or `Editor` $\rightarrow$ Proceeds to the action.
+7.  Otherwise $\rightarrow$ Returns **Status 403 Forbidden** and terminates.
+
+**Related Requirements (Requisiti collegati):** FR1.2, FR1.8, Security (BE).
+
+-----
+
+## 🧩 6. User Interface (Interfaccia utente)
+
+### 6.1 Screen Descriptions (Descrizione schermate)
+
+| ID | Nome schermata | Descrizione | Elementi principali |
+|:---|:---|:---|:---|
+| UI1 | Login/Registration | Pages for system access. | Email/Password Fields, Login/Registration Buttons. |
+| UI2 | Dashboard (FR2.1) | List of all Boards accessible to the user. | Board List, Filters/Search, "Create New Board" Button. |
+| UI3 | Kanban View (FR2.2) | Main view of a Board. | Horizontally scrollable container, Lists (columns), Cards (Draggable elements). |
+| UI4 | Card Details Modal (FR2.4) | Modal for details and interactions with a single Card. | Title, Description, Comments Section (FR1.7), Assignees/Labels (future). |
+| UI5 | Activity Log (FR1.9) | Sidebar or Modal to view the action history. | Chronological list of events (Text: "User X moved Card Y"). |
+
+### 6.2 Mockup / Wireframe
+
+*Upon completion of this phase, refer to **Phase 0 (Design)** of the development plan for the production of a complete set of Wireframes and Mockups.*
+
+-----
+
+## 🔗 7. Integrations and Dependencies (Integrazioni e dipendenze)
+
+| Servizio / Modulo | Tipo integrazione | Protocollo / API | Note |
+|:---|:---|:---|:---|
+| **MySQL Database** | Data Persistence | PDO (Prepared Statements) | Connection managed via `config.php`. |
+| **PHP Sessions** | Authentication | Cookie / Server-Side State | Basic implementation in Phase 1. |
+| **Frontend Renderer** | Initial Rendering | Server-Side Rendering (PHP) | Basic structure loading. |
+| **Dynamic Interaction** | D\&D, Modals, CRUD | AJAX / Fetch API (Vanilla JS) | Direct communication with PHP endpoints. |
+
+-----
+
+## 🧰 8. Business Rules (Regole di business)
+
+| ID | Nome | Descrizione |
 |:---|:---|:---|
-| **UX/Technical** | "Janky" Drag and Drop due to Vanilla JS code across different browsers. | **In-depth Cross-Browser Testing**; Restructure D\&D logic if problems persist. |
-| **Data Integrity** | Race conditions when two users move the same card. | Use DB-level locks (PDO transactions) or implement a timestamp strategy for concurrency control. |
-| **Security** | XSS attacks via Card Input. | Use the `htmlspecialchars()` function on the display side (frontend) as already done in `index.php` and `add_card.php`. |
-| **Scalability (BE)** | Limitations of the stateful paradigm (PHP Sessions) under high load. | Adopt Caching mechanisms (e.g., Redis) and aggressive MySQL optimization. |
+| **RB1** | Board Roles | Roles (`Owner`, `Editor`, `Viewer`) define access permissions. A User must have a role to interact with a Board (FR1.8). |
+| **RB2** | Card Positioning | The Card `position` is saved as a float/integer to facilitate reordering without massive recalculations (FR1.6). |
+| **RB3** | Password Hashing | All passwords must be stored with secure hashing (Bcrypt) (Security NFR). |
+| **RB4** | Card Deletion | Deletion via `/delete_card.php` is a **physical deletion** from the DB (3.2 Consistency). |
 
 -----
 
-## ✅ 10. Approvals
+## 🧪 9. Functional Test Cases (UAT / QA) (Casi di test funzionali)
+
+| ID | Caso di test | Step | Risultato atteso |
+|:---|:---|:---|:---|
+| **TC1** | Login and Access | Enter valid credentials, Login. | Access granted, Session created, Redirect to Dashboard (UI2). |
+| **TC2** | Card Creation | From UI3, click "Add Card" in List A, enter Title, Submit. | Card appears in List A's DOM, `/add_card.php` returns Status 200, Activity Log (FR1.9) recorded. |
+| **TC3** | Inter-List Drag & Drop | Drag Card from List A to List B. | Card moves in DOM, `/update_card_position.php` sent with `newListId=B`, DB updated (AART $<300$ms). |
+| **TC4** | Authorization Denied | `Viewer` User attempts to delete a Card (`/delete_card.php`). | BE returns Status 403 Forbidden. Card not deleted, error shown in FE (if applicable). |
+| **TC5** | I18n switch | (If selector is implemented) Select alternate language (e.g., English). | Interface texts update according to the global object `TRANSLATIONS`. |
+
+-----
+
+## 📅 10. Planning / Release (Pianificazione / Release)
+
+| Milestone | Descrizione | Data prevista | Responsabile |
+|:---|:---|:---|:---|
+| AF completed | Review and approval | 10/12/2025 | PM |
+| **Phase 1** (BE) | Setup Auth (Sessions, Hashing) | 2 weeks | Dev Team |
+| **Phase 2** (BE) | Board CRUD, List, RBAC Middleware | 3 weeks | Dev Team |
+| **Phase 3** (BE) | Card CRUD/Move, Comments | 3 weeks | Dev Team |
+| **Phase 4** (FE) | Frontend Core + Drag & Drop | 4 weeks | Dev Team |
+| **Phase 5** (FE+BE) | Integration, Activity Log, Notifications | 3 weeks | Dev Team |
+| **Phase 6** | Security, Testing, Deploy | 1 week | Dev Team |
+
+-----
+
+## ⚠️ 11. Risks and Operational Notes (Rischi e note operative)
+
+| Tipo | Descrizione | Mitigazione |
+|:---|:---|:---|
+| **Technical (FE)** | "Janky" Drag & Drop with Vanilla JS cross-browser. | **Intensive Cross-Browser Testing** (Chrome, Firefox, Safari). Consider lightweight libraries if custom logic fails. |
+| **Security (BE)** | Vulnerabilities in permissions (RBAC) for CRUD actions. | Deep code review on the authorization middleware in Phase 2. |
+| **Scalability (BE)** | Pressure on DB and PHP Session system. | Implementation of caching (e.g., Redis) in Phase 5; Query Optimization on `list_id` and `position`. |
+| **Organizational** | Lack of OpenAPI documentation. | Maintaining rigorous and updated manual documentation during Phases 2 and 3. |
+
+-----
+
+## ✅ 12. Final Approvals (Approvazioni Finali)
 
 | Name | Role |
 |:---|:---|

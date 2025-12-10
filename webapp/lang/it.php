@@ -15,8 +15,27 @@ return [
     'alert_title_empty' => 'Il titolo non può essere vuoto.',
     'alert_delete_confirm' => 'Sei sicuro di voler eliminare questa scheda?',
     'alert_title_new_empty' => 'Il titolo della scheda non può essere vuoto.',
+    'logout' => 'Esci',
+
+    'no_boards' => 'Nessuna Bacheca Trovata',
+    'new_board_btn' => 'Nuova Bacheca',
+    'create_new_board' => 'Crea Nuova Bacheca',
+    'board_name_placeholder' => 'Nome della Bacheca...',
+    'create' => 'Crea',
+
+    'manage_access' => 'Gestisci Accessi',
+    'board_access' => 'Accesso alla Bacheca',
+    'loading_members' => 'Caricamento membri...',
+    'add_member' => 'Aggiungi un Membro',
+    'email_placeholder' => "Email dell'utente...",
+    'role_owner' => 'Owner',
+    'role_editor' => 'Editor',
+    'role_viewer' => 'Viewer',
+    'remove' => 'Rimuovi',
+    'alert_confirm_remove' => "Sei sicuro di voler rimuovere questo membro? L'Owner non può essere rimosso.",
+
     // Nuovo: Pulsanti per la selezione della lingua
     'lang_it' => 'Italiano',
     'lang_en' => 'Inglese',
-    'lang_fr' => 'Francese', // Aggiunto per l'elenco dinamico
+    'lang_fr' => 'Francese',
 ];
