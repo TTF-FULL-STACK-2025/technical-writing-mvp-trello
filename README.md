@@ -79,7 +79,7 @@ The architecture is based on a modified LAMP stack for dynamic interactions:
 
 ---
 
-## 6. Team Task 👥
+## 6. Team Tasks 👥
 
 | Name | Task |
 |:---|:---|
