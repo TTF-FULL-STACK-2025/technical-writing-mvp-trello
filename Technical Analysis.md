@@ -185,3 +185,4 @@ The plan is adapted to include the development of authentication features in the
 | Marialia Pero | Member |
 | Alessandro Cervini | Member |
 | Gloria Candela | Member |
+| Nicole Caravello | Member |

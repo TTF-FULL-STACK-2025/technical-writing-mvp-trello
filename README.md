@@ -76,9 +76,27 @@ The architecture is based on a modified LAMP stack for dynamic interactions:
 | **Containerization** | **Docker** | Consistent development and production environments. |
 | **API Docs** | Manual | Documentation of AJAX endpoints (lack of auto-generation). |
 
+
 ---
 
-## 6. Team Management 👥
+## 6. Team Task 👥
+
+| Name | Task |
+|:---|:---|
+| **Matteo Fiorio** | **Senior Developer** |
+| Corinna Buzzi | ReadMe Document |
+| Nicole Caravello | ReadMe Document |
+| Filippo Granata | PRD Document |
+| Samuele Gonnella | PRD Document |
+| Gloria Candela | PRD Document |
+| Marialia Pero | Functional Analysis Document |
+| Alessandro Cervini | Functional Analysis Document |
+| Tommaso Villa | Technical Analysis Document |
+| Samuele Piazzi | Technical Analysis Document |
+
+---
+
+## 7. Team Management 👥
 
 | Name | Role |
 |:---|:---|
@@ -92,3 +110,4 @@ The architecture is based on a modified LAMP stack for dynamic interactions:
 | Marialia Pero | Member |
 | Alessandro Cervini | Member |
 | Gloria Candela | Member |
+| Nicole Caravello | Member |

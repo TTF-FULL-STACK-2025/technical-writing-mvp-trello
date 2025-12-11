@@ -228,3 +228,4 @@ The model supports the hierarchy: `Board` $\rightarrow$ `List` $\rightarrow$ `Ca
 | Marialia Pero | Member |
 | Alessandro Cervini | Member |
 | Gloria Candela | Member |
+| Nicole Caravello | Member |
